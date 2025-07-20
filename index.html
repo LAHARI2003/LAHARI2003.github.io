@@ -2,23 +2,117 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Your Name - GitHub.io</title>
+  <title>Kommalapati Lahari - Portfolio</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <style>
-    body { font-family: Arial, sans-serif; margin: 2rem; background: #f7f7f7; }
-    .main { background: #fff; padding: 2rem; border-radius: 8px; max-width: 600px; margin: auto; box-shadow: 0 2px 12px #ddd;}
-    h1 { color: #0366d6; }
+    body { font-family: 'Segoe UI', Arial, sans-serif; margin: 0; background: #f7f7f7; }
+    .container { background: #fff; padding: 2.5rem; border-radius: 12px; max-width: 750px; margin: 2rem auto; box-shadow: 0 2px 12px #ddd; }
+    h1 { color: #0366d6; letter-spacing: 1px; }
+    h2 { color: #222; border-bottom: 1px solid #eee; padding-bottom: 0.3rem; margin-bottom: 1rem; margin-top: 2rem;}
+    ul, li { margin: 0; padding: 0; list-style: none;}
+    .info { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-bottom: 1.5rem; }
+    .info div { min-width: 200px; }
+    .link-list a { color: #0366d6; text-decoration: none; margin-right: 1.2rem; }
+    .link-list a:hover { text-decoration: underline; }
+    .skills, .achievements, .leadership { margin-bottom: 1rem; }
+    .section-content { margin-bottom: 1.5rem; }
+    .exp-title { font-weight: bold; }
+    .institution { color: #444; font-style: italic; }
+    @media (max-width: 600px) {
+      .container { padding: 1rem; }
+      .info { flex-direction: column; gap: 0; }
+    }
   </style>
 </head>
 <body>
-  <div class="main">
-    <h1>Hello, I'm Your Name!</h1>
-    <p>Welcome to my GitHub Pages site.</p>
-    <p>I am from Greater Noida, Uttar Pradesh, India.</p>
-    <ul>
-      <li>Contact: lahari1803ks@gmail.com</li>
-      <li><a href="https://github.com/LAHARI2003">View my GitHub Profile</a></li>
-    </ul>
+  <div class="container">
+    <h1>Kommalapati Lahari</h1>
+    <div class="info">
+      <div>
+        <b>Location:</b> Greater Noida, Uttar Pradesh, India<br>
+        <b>Email:</b> <a href="mailto:lahari1803ks@gmail.com">lahari1803ks@gmail.com</a><br>
+        <b>Contact:</b> +91-7989410372
+      </div>
+      <div class="link-list">
+        <a href="https://github.com/LAHARI2003" target="_blank">GitHub</a>
+        <a href="https://linkedin.com/in/kommalapati-lahari" target="_blank">LinkedIn</a>
+      </div>
+    </div>
+
+    <h2>Education</h2>
+    <div class="section-content">
+      <b>B.Tech, Computer Science & Engineering</b>
+      <span class="institution">— IIT Patna (2021–2025)</span><br>
+      Percentage: 82%<br>
+      <b>Grade 12</b>
+      <span class="institution">— Narayana Junior College, Vijayawada (2019–2021)</span><br>
+      Percentage: 97.5%
+    </div>
+
+    <h2>Experience</h2>
+    <div class="section-content">
+      <div>
+        <span class="exp-title">Project Trainee — STMicroelectronics</span><br>
+        <span class="institution">Jan 2025 – Present</span><br>
+        <ul>
+          <li>Optimizing Agentic AI workflows for HLS code performance (Python, C++, Swarm, OpenAI Agents SDK).</li>
+          <li>Developed benchmark suite for PPA metrics and created unique C++ HLS code repository from RTL sources.</li>
+        </ul>
+      </div>
+      <div>
+        <span class="exp-title">Undergraduate Research Intern — IIT Hyderabad</span><br>
+        <span class="institution">May 2024 – July 2024</span><br>
+        <ul>
+          <li>Data analytics & ML for driver behavior using PCA, K-means clustering, and feature engineering.</li>
+        </ul>
+      </div>
+    </div>
+
+    <h2>Projects</h2>
+    <div class="section-content">
+      <div>
+        <b>Autonomous Smart Contract Hardening</b> (Aug 2024 – May 2025)<br>
+        <i>Blockchain, AI, Solidity, Python, LLMs</i><br>
+        Agent-based security framework for Solidity smart contracts, integrating exploit simulation and real-time fixes.
+      </div>
+      <div>
+        <b>Training & Placement Cell Web Portal</b> (Feb 2023 – May 2023)<br>
+        <i>HTML, CSS, PHP, Bootstrap, MySQL</i><br>
+        User management and analytics for IIT Patna’s placement cell; multi-role login, DB-driven data handling.
+      </div>
+    </div>
+
+    <h2>Research Publications</h2>
+    <div class="section-content">
+      <ul>
+        <li>Classification of Driving Styles at Exit Ramp Terminals — <em>TRB Annual Meeting 2025 (Accepted)</em></li>
+        <li>Autonomous Smart Contract Hardening: The Fusion of LLMs and Invariant-Guided Security Repair — <em>ASE Conference 2025 (Under Review)</em></li>
+      </ul>
+    </div>
+
+    <h2>Technical Skills</h2>
+    <div class="skills">
+      <b>Languages:</b> C, C++, Python, MySQL<br>
+      <b>Frameworks & Tools:</b> VS Code, GitHub, OpenAI SDK, ADK, NVDLA<br>
+      <b>Coursework:</b> DSA, ML & Data Science, AI, Database Systems, OS, Networks
+    </div>
+
+    <h2>Achievements</h2>
+    <div class="achievements">
+      <ul>
+        <li>Amazon ML Challenge: Top 0.17% (Rank 130/74,839)</li>
+        <li>Meta Hacker Cup 2024: Rank 6304/22,000+</li>
+        <li>Inter IIT Tech Meet: 1st Place in Tech Event</li>
+        <li>IIT-JEE Main: 99.45 percentile, Advanced Qualified (top 0.1%)</li>
+        <li>Cleared IOQP & IOQC (Top 5% in national olympiads, IAPT)</li>
+      </ul>
+    </div>
+
+    <h2>Leadership</h2>
+    <div class="leadership">
+      <b>TEDxIIT Patna | Co-Organizer & Overall Lead</b> (Feb 2023 – Jan 2024)<br>
+      Led team of 60 for TEDxIIT Patna, managing 600+ attendees and 8 lakh+ budget with 10+ global speakers.
+    </div>
   </div>
 </body>
 </html>
