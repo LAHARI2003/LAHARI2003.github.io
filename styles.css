@@ -7,7 +7,7 @@
 
 body {
     font-family: 'Arial', sans-serif;
-    background-color: #f0f8f0; /* Light green background */
+    background-color:#fff2cf; /* Light green background */
     min-height: 100vh;
     display: flex;
     align-items: center;
@@ -113,3 +113,6 @@ body {
         padding: 8px 16px;
     }
 }
+
+
+
