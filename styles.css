@@ -60,7 +60,7 @@ body {
     text-decoration: none;
     font-size: 1.2rem;
     font-weight: 500;
-    padding: 10px 20px;
+    padding: 8px 12px;
     border-radius: 5px;
     transition: all 0.3s ease;
     flex: 1;
@@ -119,6 +119,20 @@ body {
 .site-header {
     text-align: center;
     margin-top: 24px;
+}
+
+/* Icon link styles */
+.nav-with-icon {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nav-icon {
+    width: 22px;
+    height: 22px;
+    object-fit: cover;
+    border-radius: 4px;
 }
 
 /* THEME OVERRIDES FROM USER */
