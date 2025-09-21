@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GPT-OSS-20B on H100 — Profiling (Graphical)</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>mermaid.initialize({ startOnLoad: true });</script>
+</head>
+<body>
+    <div class="container">
+        <div class="content-box">
+            <h1 class="page-title">GPT-OSS-20B on H100 — Profiling (Graphical)</h1>
+            <div style="margin-bottom:24px"><a class="nav-link" href="blog.html">← Back to Blog</a></div>
+
+            <p>This page gives a visual summary of an Nsight Systems profile for running <code>openai/gpt-oss-20b</code> with <code>transformers</code> on an H100 instance.</p>
+
+            <h3>Source files referenced</h3>
+            <ul>
+                <li><code>gptoss20.py</code></li>
+                <li><code>gptoss20b_profile_version_1.nsys-rep</code></li>
+                <li><code>gptoss20b_profile_version_1.txt</code></li>
+            </ul>
+
+            <h2>CUDA API time distribution</h2>
+            <div class="mermaid">
+pie title CUDA API Time (%)
+  "cudaLaunchKernel" : 42.6
+  "cudaMemcpyAsync" : 41.0
+  "cudaStreamSynchronize" : 9.4
+  "cuLaunchKernelEx" : 4.4
+  "cudaMemsetAsync" : 1.1
+  "cuLibraryLoadData" : 0.8
+  "cuKernelGetAttribute" : 0.2
+  "Other" : 0.2
+            </div>
+            <p><em>Interpretation:</em> Kernel launch overhead and H2D transfers dominate CUDA API time, typical for autoregressive decoding.</p>
+
+            <h2>GPU memory ops (by time)</h2>
+            <div class="mermaid">
+pie title GPU MemOps Time (%)
+  "Host→Device" : 99.2
+  "Memset" : 0.6
+  "Device→Device" : 0.1
+  "Device→Host" : 0.1
+            </div>
+            <p><em>Interpretation:</em> Almost all mem time is host-to-device transfers, indicating large initial weight loads plus smaller per-step inputs.</p>
+
+            <h2>GPU memory ops (by size)</h2>
+            <div class="mermaid">
+pie title GPU MemOps Size (MB)
+  "Host→Device (13761.269 MB)" : 13761.269
+  "Device→Device (205.920 MB)" : 205.920
+  "Memset (0.257 MB)" : 0.257
+  "Device→Host (0.004 MB)" : 0.004
+            </div>
+            <p><em>Interpretation:</em> ~13.76 GB moved H2D across 1026 copies (avg ~13.4 MB; max ~1.16 GB), consistent with one-time weight movement plus incremental traffic.</p>
+
+            <h2>Top GPU kernels (time share)</h2>
+            <div class="mermaid">
+pie title Top GPU Kernels Time (%)
+  "nvjet_tst_384x8_64x4_1x1_v_bz_NNT" : 40.9
+  "nvjet_tst_192x8_64x8_1x1_v_bz_NNT" : 20.7
+  "Elementwise kernel (A)" : 5.7
+  "Elementwise kernel (B)" : 3.9
+  "Other kernels" : 28.8
+            </div>
+            <p><em>Interpretation:</em> Time is concentrated in GEMM-like kernels (attention/MLP). Elementwise ops and reductions are smaller contributors.</p>
+
+            <h2>End-to-end flow (schematic)</h2>
+            <div class="mermaid">
+flowchart LR
+  A[Load model + weights] -->|Large H2D| B[Weights in VRAM]
+  B --> C[Tokenize + Prepare inputs]
+  C --> D[Decode loop: step-by-step]
+  D -->|Kernels| E[GEMM-heavy (nvjet_tst_*)]
+  D -->|Softmax/Reduce| F[Softmax/Reductions]
+  D -->|Minor H2D| G[Inputs/Cache updates]
+  E --> H[Generated tokens]
+  F --> H
+  G --> D
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+
+
