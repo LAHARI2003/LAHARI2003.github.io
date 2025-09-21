@@ -6,27 +6,28 @@
 }
 
 body {
-    font-family: 'Arial', sans-serif;
-    background-color:#fff2cf; /* Light green background */
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    background-color: #fff2cf;
+    color: #1f1f1f;
     min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    line-height: 1.6;
 }
 
 .container {
     width: 100%;
-    max-width: 800px;
-    padding: 20px;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 24px 16px 64px;
 }
 
+/* Legacy content box styles retained for compatibility (unused now) */
 .content-box {
-    background-color: #e8f5e8; /* Slightly darker light green for content area */
-    border: 2px solid #8a2be2; /* Purple border */
-    border-radius: 8px;
-    padding: 40px;
-    text-align: center;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    padding: 0;
+    text-align: left;
+    box-shadow: none;
 }
 
 /* Name styling */
@@ -114,5 +115,73 @@ body {
     }
 }
 
+/* New site layout styles */
+.site-header {
+    text-align: center;
+    margin-top: 24px;
+}
 
+.site-title {
+    font-size: 2.75rem;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
 
+.site-subtitle {
+    margin-top: 8px;
+    font-size: 1.25rem;
+    color: rgba(0, 0, 0, 0.65);
+}
+
+.site-nav {
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 28px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+}
+
+.nav-item {
+    text-decoration: none;
+    color: #1f1f1f;
+    padding-bottom: 6px;
+    border-bottom: 2px solid transparent;
+    transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.nav-item:hover, .nav-item.active {
+    border-bottom-color: #1f1f1f;
+}
+
+.hero {
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    align-items: start;
+    gap: 48px;
+    margin-top: 48px;
+}
+
+.hero-text p {
+    font-size: 1.125rem;
+    margin-bottom: 20px;
+}
+
+.image-placeholder {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 12px;
+    background: #ececec;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+}
+
+@media (max-width: 900px) {
+    .hero {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    .image-placeholder {
+        width: 70%;
+        margin: 0 auto;
+    }
+}
