@@ -70,16 +70,7 @@ pie title Top GPU Kernels Time (%)
 
             <h2>End-to-end flow (schematic)</h2>
             <div class="mermaid">
-flowchart LR
-  A[Load model + weights] -->|Large H2D| B[Weights in VRAM]
-  B --> C[Tokenize + Prepare inputs]
-  C --> D[Decode loop: step-by-step]
-  D -->|Kernels| E[GEMM-heavy (nvjet_tst_*)]
-  D -->|Softmax/Reduce| F[Softmax/Reductions]
-  D -->|Minor H2D| G[Inputs/Cache updates]
-  E --> H[Generated tokens]
-  F --> H
-  G --> D
+
             </div>
         </div>
     </div>
