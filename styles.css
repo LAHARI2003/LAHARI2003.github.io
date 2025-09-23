@@ -253,6 +253,14 @@ code:not([class*="language-"]) { background-color: #fff2cf; color: #000000; padd
     margin-bottom: 14px;
 }
 
+/* Publications */
+.pubs-section { margin-top: 28px; }
+.pubs-section h2 { color: #111; font-weight: 700; margin-bottom: 16px; }
+.pub-item { margin-bottom: 18px; }
+.pub-title { font-weight: 600; }
+.pub-venue { color: #444; font-size: 0.95rem; margin-top: 2px; }
+.pub-links a { text-decoration: none; position: relative; }
+
 .hero {
     display: grid;
     grid-template-columns: 1fr 380px;
