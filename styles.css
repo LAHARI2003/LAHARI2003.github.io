@@ -236,6 +236,22 @@ code:not([class*="language-"]) { background-color: #fff2cf; color: #000000; padd
 
 .nav-item:hover, .nav-item.active { border-bottom-color: #007BFF; }
 
+/* About section styles */
+.about-section {
+    text-align: left;
+    max-width: 900px;
+    margin: 40px auto 0;
+}
+
+.about-section h2 {
+    margin-bottom: 12px;
+    font-weight: 600;
+}
+
+.about-section p {
+    margin-bottom: 14px;
+}
+
 .hero {
     display: grid;
     grid-template-columns: 1fr 380px;
