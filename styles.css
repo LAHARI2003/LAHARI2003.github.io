@@ -238,12 +238,13 @@ code:not([class*="language-"]) { background-color: #fff2cf; color: #000000; padd
 
 /* About section styles */
 .about-section {
-    text-align: left;
+    text-align: left !important;
     max-width: 900px;
-    margin: 40px auto 0;
+    margin: 64px auto 0;
 }
 
 .about-section h2 {
+    text-align: left;
     margin-bottom: 12px;
     font-weight: 600;
 }
