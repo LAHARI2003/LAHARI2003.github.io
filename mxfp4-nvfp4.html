@@ -6,26 +6,39 @@
     <title>MXFP4 & NVFP4: In-Depth Technical FAQ</title>
     <link rel="stylesheet" href="styles.css">
     <style>
-        .question { font-weight: bold; font-size: 1.13em; margin-top:32px; margin-bottom: 10px; }
-        .answer-block { margin-bottom: 32px; line-height: 1.7; }
-        .ref-section { margin-top: 36px; }
-        .md-section { margin-top: 26px; }
-        ul, ol { margin-bottom: 0.3em; margin-top: 0.3em; }
+        .question {
+            display: block;
+            background: #faf7ff;
+            font-weight: bold;
+            font-size: 1.23em;
+            padding: 18px 22px 16px 18px;
+            border-radius: 7px;
+            margin: 48px 0 26px 0;
+            line-height: 1.42;
+        }
+        .answer-block {
+            margin-bottom: 44px;
+            line-height: 1.75;
+            font-size: 1.08em;
+        }
+        .ref-section { margin-top: 52px; }
+        .md-section { margin-top: 34px; }
+        ul, ol { margin-bottom: 1em; margin-top: 0.25em; }
     </style>
 </head>
 <body>
 <div class="container">
   <div class="content-box">
     <h1 class="page-title">MXFP4 & NVFP4: Microscaled 4-bit Floating Point Formats for Modern AI</h1>
-    <div style="margin-bottom:24px"><a class="nav-link" href="blog.html">← Back to Blog</a></div>
+    <div style="margin-bottom:28px"><a class="nav-link" href="blog.html">← Back to Blog</a></div>
     <p class="date">Published: October 2025</p>
 
     <div class="md-section">
-      <p><b>Simple Questions on Why and How microscaled 4-bit floating point formats—MXFP4 and NVFP4—work:</b></p>
+      <p><strong>Simple Questions on Why and How microscaled 4-bit floating point formats—MXFP4 and NVFP4—work:</strong></p>
     </div>
 
     <div class="md-section">
-      <div class="question">Why do these numerical formats work in practice? What property is being exploited, and what exactly are MXFP4 and NVFP4?</div>
+      <span class="question">Why do these numerical formats work in practice? What property is being exploited, and what exactly are MXFP4 and NVFP4?</span>
       <div class="answer-block">
         <p><b>The Core Property:</b> MXFP4 and NVFP4 leverage a fundamental feature of neural network weights and activations: <b>values exhibit locally similar magnitudes along contiguous tensor dimensions.</b> Rather than facing extreme outliers scattered throughout tensors, values tend to cluster within specific ranges when analyzed in small neighborhoods. This <b>locality property</b> makes block-wise quantization highly effective for both storage and computation.</p>
 
@@ -48,7 +61,7 @@
     </div>
 
     <div class="md-section">
-      <div class="question">Intuitively, doesn't requiring an extra dequantization step mean more arithmetic operations? If so, how does this actually benefit us compared to the commonly-used BFloat16?</div>
+      <span class="question">Intuitively, doesn't requiring an extra dequantization step mean more arithmetic operations? If so, how does this actually benefit us compared to the commonly-used BFloat16?</span>
       <div class="answer-block">
         <p><b>LLM Inference is Memory-Bound, Not Compute-Bound</b></p>
         <p>The key insight: Modern GPUs spend 80–90% of time moving data from memory, not performing computation. With BFloat16, each parameter transfer requires 16 bits from HBM memory to GPU cores. For a 70B model, that results in 140GB of data movement per forward pass! FP4 reduces this to roughly 40GB—a 3.5× drop in memory bandwidth use.</p>
@@ -59,7 +72,7 @@
     </div>
 
     <div class="md-section">
-      <div class="question">What kind of hardware support exists for MXFP4 and NVFP4 formats?</div>
+      <span class="question">What kind of hardware support exists for MXFP4 and NVFP4 formats?</span>
       <div class="answer-block">
         <p><b>MXFP4 Hardware Requirements</b><br>
         MXFP4 requires NVIDIA GPUs with compute capability 9.0 or higher. This restricts support to recent architectures:</p>
@@ -80,7 +93,7 @@
     </div>
 
     <div class="md-section">
-      <div class="question">What are the drawbacks of these formats?</div>
+      <span class="question">What are the drawbacks of these formats?</span>
       <div class="answer-block">
         <ol>
           <li><b>NVFP4:</b> Its very small group size neutralizes outlier mitigation techniques traditionally used with larger quantization groups.</li>
@@ -90,18 +103,31 @@
     </div>
 
     <div class="md-section">
-      <div class="question">Proofs that these formats work:</div>
+      <span class="question">Proofs that these formats work:</span>
       <div class="answer-block">
         <ul>
           <li>GPT-OSS models have been post-training quantized (PTQ) using the MXFP4 format, showing strong accuracy and inference speedup.</li>
           <li>The checkpoint referenced in the official model card uses MXFP4; evaluations and blog results for these models are based on MXFP4 quantization.</li>
         </ul>
+
+        <div style="margin: 34px 0 16px 0; text-align: center;">
+          <img src="gptoss 20 billion accuracy.png" alt="GPT-OSS 20B Benchmark Accuracy Bar Plots" style="max-width:95%;height:auto;margin-bottom:11px;border-radius:8px;box-shadow:0 2px 8px rgba(180,120,255,0.08)">
+          <div style="margin-bottom:26px;font-size: 1.01em;color: #333;">
+            <b>Figure:</b> Accuracy metrics for GPT-OSS-20B under competition math, science, expert, and college-level exams after MXFP4 quantization (from official model card).
+          </div>
+        </div>
+        <div style="margin: 44px 0 22px 0; text-align: center;">
+          <img src="gpt oss check points from the model card.png" alt="GPT-OSS Model Card Checkpoint Table" style="max-width:80%;height:auto;margin-bottom:11px;border-radius:8px;box-shadow:0 2px 8px rgba(180,120,255,0.08)">
+          <div style="margin-bottom:14px;font-size: 1.01em;color: #333;">
+            <b>Table:</b> Model checkpoint parameter breakdowns (MLP, attention, parameter counts, checkpoint sizes), confirming critical technical details of GPT-OSS 120B/20B deployments.
+          </div>
+        </div>
         <p><b>Paste the results from the primary paper below to demonstrate the performance and accuracy achieved with these quantization algorithms.</b></p>
       </div>
     </div>
 
     <div class="ref-section">
-      <div class="question">Reference Links</div>
+      <span class="question">Reference Links</span>
       <ul>
         <li><a href="https://cdn.openai.com/pdf/419b6906-9da6-406c-a19d-1bb078ac7637/oai_gpt-oss_model_card.pdf" target="_blank" rel="noopener noreferrer">OpenAI GPT-OSS Model Card (PDF)</a></li>
         <li><a href="https://developer.nvidia.com/blog/introducing-nvfp4-for-efficient-and-accurate-low-precision-inference/" target="_blank" rel="noopener noreferrer">NVIDIA Developer Blog: Introducing NVFP4</a></li>
