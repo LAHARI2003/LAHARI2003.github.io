@@ -6,36 +6,75 @@
     <title>MXFP4 & NVFP4: In-Depth Technical FAQ</title>
     <link rel="stylesheet" href="styles.css">
     <style>
+        html { scroll-behavior: smooth; }
+        .container { margin-bottom: 46px; }
+        .page-title { margin-bottom: 44px !important; }
+        .md-section, .ref-section { margin-top: 54px !important; margin-bottom: 48px !important; }
         .question {
             display: block;
             background: #faf7ff;
             font-weight: bold;
-            font-size: 1.23em;
-            padding: 18px 22px 16px 18px;
-            border-radius: 7px;
-            margin: 48px 0 26px 0;
-            line-height: 1.42;
+            font-size: 1.27em;
+            padding: 22px 32px 18px 20px;
+            border-radius: 8px;
+            margin: 52px 0 28px 0;
+            line-height: 1.43;
         }
         .answer-block {
-            margin-bottom: 44px;
-            line-height: 1.75;
+            margin-bottom: 62px;
+            line-height: 1.83;
+            font-size: 1.13em;
+            padding-left: 6px;
+        }
+        .answer-block p, .answer-block ul, .answer-block ol {
+            margin-top: 20px;
+            margin-bottom: 20px;
+        }
+        .answer-block ul, .answer-block ol {
+            padding-left: 36px;
+            margin-bottom: 24px;
+        }
+        .mini-topic {
+            display:block;
+            font-weight: bold;
+            margin-top: 32px;
+            margin-bottom: 6px;
             font-size: 1.08em;
         }
-        .ref-section { margin-top: 52px; }
-        .md-section { margin-top: 34px; }
-        ul, ol { margin-bottom: 1em; margin-top: 0.25em; }
+        .ref-section { margin-top: 70px !important; margin-bottom: 50px !important; }
+        .qa-toc {
+            margin: 36px 0 60px 0;
+            padding: 28px 32px 28px 24px;
+            background: #f9f5ee;
+            border-left: 7px solid #d5b77f;
+            border-radius: 10px;
+        }
+        .qa-toc-title { font-size: 1.17em; font-weight: 600; margin-bottom: 18px; }
+        .qa-toc ul { font-size:1.12em; margin-bottom:0; margin-top:10px; }
+        .qa-toc li { margin-bottom: 10px; }
+        .img-caption {
+            font-size: 1.05em;
+            margin-top: 9px;
+            margin-bottom: 36px;
+            color: #444;
+        }
+        @media (max-width: 700px) {
+            .qa-toc { padding:14px 6px 14px 8px; }
+            .question { font-size:1.10em;padding:12px 6px 12px 8px;}
+            .answer-block { font-size:1em;padding-left:3px; }
+        }
     </style>
 </head>
 <body>
 <div class="container">
   <div class="content-box">
-    <h1 class="page-title">MXFP4 & NVFP4: Microscaled 4-bit Floating Point Formats for Modern AI</h1>
-    <div style="margin-bottom:28px"><a class="nav-link" href="blog.html">← Back to Blog</a></div>
+    <h1 class="page-title">MXFP4 & NVFP4: Microscaled 4-bit Floating Point Formats</h1>
+    <div style="margin-bottom:32px"><a class="nav-link" href="blog.html">← Back to Blog</a></div>
     <p class="date">Published: October 2025</p>
 
-    <div class="md-section" style="margin-top:12px;margin-bottom:36px">
-      <b>In this article I answer the following questions (click to jump):</b>
-      <ul style="list-style-type: decimal; padding-left: 18px; font-size:1.10em; margin-top:12px; margin-bottom:10px;">
+    <div class="qa-toc">
+      <div class="qa-toc-title">In this article I answer the following questions (click to jump):</div>
+      <ul style="list-style-type: decimal; padding-left: 22px;">
         <li><a href="#q-why">Why do these numerical formats work in practice? What property is being exploited, and what exactly are MXFP4 and NVFP4?</a></li>
         <li><a href="#q-arith">Intuitively, doesn't requiring an extra dequantization step mean more arithmetic operations? If so, how does this actually benefit us compared to the commonly-used BFloat16?</a></li>
         <li><a href="#q-hw">What kind of hardware support exists for MXFP4 and NVFP4 formats?</a></li>
@@ -48,18 +87,19 @@
     <div class="md-section">
       <span class="question" id="q-why">Why do these numerical formats work in practice? What property is being exploited, and what exactly are MXFP4 and NVFP4?</span>
       <div class="answer-block">
-        <p><b>The Core Property:</b> MXFP4 and NVFP4 leverage a fundamental feature of neural network weights and activations: <b>values exhibit locally similar magnitudes along contiguous tensor dimensions.</b> Rather than facing extreme outliers scattered throughout tensors, values tend to cluster within specific ranges when analyzed in small neighborhoods. This <b>locality property</b> makes block-wise quantization highly effective for both storage and computation.</p>
+        <span class="mini-topic">The Core Property:</span>
+        <p>MXFP4 and NVFP4 leverage a fundamental feature of neural network weights and activations: <b>values exhibit locally similar magnitudes along contiguous tensor dimensions.</b> Rather than facing extreme outliers scattered throughout tensors, values tend to cluster within specific ranges when analyzed in small neighborhoods. This <b>locality property</b> makes block-wise quantization highly effective for both storage and computation.</p>
 
-        <p><b>MXFP4: Power-of-Two Block Scaling</b><br>
-        MXFP4 divides tensors into blocks of 32 contiguous elements, where each block shares a single scaling factor stored in E8M0 format (8-bit exponent-only, no mantissa). This power-of-two scaling works as follows:</p>
+        <span class="mini-topic">MXFP4: Power-of-Two Block Scaling</span>
+        <p>MXFP4 divides tensors into blocks of 32 contiguous elements, where each block shares a single scaling factor stored in E8M0 format (8-bit exponent-only, no mantissa). This power-of-two scaling works as follows:</p>
         <ul>
           <li>For each block, the scale is computed from the block's maximum absolute value, allowing dynamic local adaptation.</li>
           <li>Each 4-bit value uses an <b>E2M1 representation</b> (2 exponent bits, 1 mantissa bit, 1 sign bit), covering approximately -6 to +6 in normalized form.</li>
           <li>The dequantized value is: <code>dequantized_value = FP4_value × scale_factor</code></li>
         </ul>
 
-        <p><b>NVFP4: Fine-Grained Fractional Scaling</b><br>
-        NVFP4 enhances this method with two critical improvements:</p>
+        <span class="mini-topic">NVFP4: Fine-Grained Fractional Scaling</span>
+        <p>NVFP4 enhances this method with two critical improvements:</p>
         <ul>
           <li><b>Smaller block size:</b> Block size is reduced from 32 to 16 for finer local adaptation and more frequent scaling opportunities. This enables precise capture of local maxima, significantly reducing the impact of mini-outliers.</li>
           <li><b>High-precision scaling:</b> NVFP4 utilizes E4M3 FP8 for scale factors instead of E8M0, enabling non-power-of-two scaling with fractional precision. The 3-bit mantissa offers 8× more scaling levels between powers of two, reducing quantization error by better matching the true data distribution.</li>
@@ -71,27 +111,27 @@
     <div class="md-section">
       <span class="question" id="q-arith">Intuitively, doesn't requiring an extra dequantization step mean more arithmetic operations? If so, how does this actually benefit us compared to the commonly-used BFloat16?</span>
       <div class="answer-block">
-        <p><b>LLM Inference is Memory-Bound, Not Compute-Bound</b></p>
+        <span class="mini-topic">LLM Inference is Memory-Bound, Not Compute-Bound</span>
         <p>The key insight: Modern GPUs spend 80–90% of time moving data from memory, not performing computation. With BFloat16, each parameter transfer requires 16 bits from HBM memory to GPU cores. For a 70B model, that results in 140GB of data movement per forward pass! FP4 reduces this to roughly 40GB—a 3.5× drop in memory bandwidth use.</p>
 
-        <p><b>The Dequantization Overhead is Negligible</b><br>
-        While dequantization adds an extra scaling step, the additional operations amount to about 6% more arithmetic—but this operates on the small (10–20%) fraction of time spent doing compute. Modern tensor cores perform the dequantization <b>fused</b> into the GEMM kernel; scaling occurs as values load into registers, not as a separate operation. As a result, the total execution time increase is typically &lt;1%.</p>
+        <span class="mini-topic">The Dequantization Overhead is Negligible</span>
+        <p>While dequantization adds an extra scaling step, the additional operations amount to about 6% more arithmetic—but this operates on the small (10–20%) fraction of time spent doing compute. Modern tensor cores perform the dequantization <b>fused</b> into the GEMM kernel; scaling occurs as values load into registers, not as a separate operation. As a result, the total execution time increase is typically &lt;1%.</p>
       </div>
     </div>
 
     <div class="md-section">
       <span class="question" id="q-hw">What kind of hardware support exists for MXFP4 and NVFP4 formats?</span>
       <div class="answer-block">
-        <p><b>MXFP4 Hardware Requirements</b><br>
-        MXFP4 requires NVIDIA GPUs with compute capability 9.0 or higher. This restricts support to recent architectures:</p>
+        <span class="mini-topic">MXFP4 Hardware Requirements</span>
+        <p>MXFP4 requires NVIDIA GPUs with compute capability 9.0 or higher. This restricts support to recent architectures:</p>
         <ul>
           <li><b>Datacenter GPUs:</b> H100 (80GB/90GB), H200 (141GB HBM3e), and GH200 Grace Hopper Superchip, all using Hopper. Newer Blackwell datacenter GPUs (B100, B200, GB200) also support MXFP4.</li>
           <li><b>Consumer GPUs:</b> GeForce RTX 50 series (5090, 5080, 5070 Ti, 5070, 5060 Ti, 5060) and RTX Pro Blackwell workstation cards bring MXFP4 to desktops.</li>
         </ul>
-        <p><b>Important Note:</b> Popular GPUs such as RTX 4090, A100, and RTX 3090 are <b>not supported</b> for MXFP4 models—they lack the required new-generation tensor cores.</p>
+        <p style="margin-top: 13px;"><b>Important Note:</b> Popular GPUs such as RTX 4090, A100, and RTX 3090 are <b>not supported</b> for MXFP4 models—they lack the required new-generation tensor cores.</p>
 
-        <p><b>NVFP4 Hardware Requirements</b><br>
-        NVFP4 is exclusive to Blackwell architecture (compute capability 10.0+), leveraging fifth-generation Tensor Cores that support native FP4 ops and dynamic scaling:</p>
+        <span class="mini-topic">NVFP4 Hardware Requirements</span>
+        <p>NVFP4 is exclusive to Blackwell architecture (compute capability 10.0+), leveraging fifth-generation Tensor Cores that support native FP4 ops and dynamic scaling:</p>
         <ul>
           <li><b>Blackwell GPUs:</b> B100 and B200 deliver 20 PFLOPS FP4 performance with specialized tensor cores covering scaling and grouping automatically.</li>
           <li><b>Blackwell Ultra:</b> GB300/B300 delivers 50% better NVFP4 performance than standard Blackwell, with 288GB HBM3e memory and improved efficiency.</li>
@@ -103,8 +143,8 @@
     <div class="md-section">
       <span class="question" id="q-drawbacks">What are the drawbacks of these formats?</span>
       <div class="answer-block">
-        <ol>
-          <li><b>NVFP4:</b> Its very small group size neutralizes outlier mitigation techniques traditionally used with larger quantization groups.</li>
+        <ol style="margin-left: 18px;">
+          <li style="margin-bottom: 14px;"><b>NVFP4:</b> Its very small group size neutralizes outlier mitigation techniques traditionally used with larger quantization groups.</li>
           <li><b>MXFP4:</b> The power-of-two-only scale quantization can significantly degrade accuracy, due to high error from coarse scaling.</li>
         </ol>
       </div>
@@ -113,20 +153,19 @@
     <div class="md-section">
       <span class="question" id="q-proof">Proofs that these formats work:</span>
       <div class="answer-block">
-        <ul>
+        <ul style="margin-bottom: 36px;">
           <li>GPT-OSS models have been post-training quantized (PTQ) using the MXFP4 format, showing strong accuracy and inference speedup.</li>
           <li>The checkpoint referenced in the official model card uses MXFP4; evaluations and blog results for these models are based on MXFP4 quantization.</li>
         </ul>
-
-        <div style="margin: 34px 0 16px 0; text-align: center;">
+        <div style="margin: 44px 0 14px 0; text-align: center;">
           <img src="gptoss 20 billion accuracy.png" alt="GPT-OSS 20B Benchmark Accuracy Bar Plots" style="max-width:95%;height:auto;margin-bottom:11px;border-radius:8px;box-shadow:0 2px 8px rgba(180,120,255,0.08)">
-          <div style="margin-bottom:26px;font-size: 1.01em;color: #333;">
+          <div class="img-caption">
             <b>Figure:</b> Accuracy metrics for GPT-OSS-20B under competition math, science, expert, and college-level exams after MXFP4 quantization (from official model card).
           </div>
         </div>
-        <div style="margin: 44px 0 22px 0; text-align: center;">
+        <div style="margin: 56px 0 24px 0; text-align: center;">
           <img src="gpt oss check points from the model card.png" alt="GPT-OSS Model Card Checkpoint Table" style="max-width:80%;height:auto;margin-bottom:11px;border-radius:8px;box-shadow:0 2px 8px rgba(180,120,255,0.08)">
-          <div style="margin-bottom:14px;font-size: 1.01em;color: #333;">
+          <div class="img-caption">
             <b>Table:</b> Model checkpoint parameter breakdowns (MLP, attention, parameter counts, checkpoint sizes), confirming critical technical details of GPT-OSS 120B/20B deployments.
           </div>
         </div>
