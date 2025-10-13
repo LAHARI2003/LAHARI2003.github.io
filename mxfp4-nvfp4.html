@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MXFP4 & NVFP4: Efficient 4-bit Floating Points for AI/LLM Inference</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="content-box">
+            <h1 class="page-title">MXFP4 & NVFP4: Efficient 4-bit Floating Point Formats for LLM Inference</h1>
+            <div style="margin-bottom:24px"><a class="nav-link" href="blog.html">← Back to Blog</a></div>
+            <p class="date">Published: October 2025</p>
+            <h2>Introduction</h2>
+            <p><strong>Why do microscaled 4-bit floating point formats work for AI inference? What properties do MXFP4 and NVFP4 exploit, and what exactly are these formats?</strong></p>
+            <h3>The Core Property</h3>
+            <p>Both MXFP4 and NVFP4 exploit a fundamental property of neural network weights/activations: <b>values tend to have locally similar magnitudes along contiguous tensor dimensions.</b> Instead of extreme outliers distributed everywhere, values cluster within certain ranges when examined in small regions, making <b>block-wise quantization</b> highly effective.</p>
+            <h2>MXFP4: Power-of-Two Block Scaling</h2>
+            <ul>
+                <li><b>Block size:</b> 32 contiguous elements per block.</li>
+                <li><b>Scaling method:</b> Each block shares one scaling factor, stored in E8M0 format (8-bit exponent, no mantissa, power-of-two only).</li>
+                <li>Scale per block is set from the block's max absolute value for local dynamic range adaptation.</li>
+                <li>Each 4-bit value is E2M1 (2 exponent, 1 mantissa, 1 sign), covering ~-6 to +6 normalized.</li>
+                <li><b>Dequantization:</b> <code>dequantized_value = FP4_value × scale_factor</code></li>
+            </ul>
+            <h2>NVFP4: Fine-Grained Fractional Scaling</h2>
+            <ul>
+                <li><b>Smaller block size:</b> Only 16 elements, giving more scaling flexibility and capturing local maxima better.</li>
+                <li><b>High-precision scaling:</b> Uses E4M3 FP8 for scale, allowing fractional, non-power-of-two scaling (<b>8×</b> more scaling levels between powers of two than MXFP4, reducing quantization error).</li>
+                <li><b>Two-level scale:</b> An E4M3 scale for each 16-value microblock <b>plus</b> a global FP32 scale for the entire tensor. This reduces both local and global quantization error.</li>
+            </ul>
+            <h2>Performance vs BFloat16 (Common Baseline)</h2>
+            <h3>Isn't dequantization overhead high with an extra step?</h3>
+            <p><b>Not really.</b> Modern LLM inference is <b>memory-bound</b>, not compute-bound. GPUs spend 80–90% of time just moving data, not calculating. Loading parameters in BFloat16 (16-bits/param) for a 70B model moves 140GB/pass. With FP4, only ~40GB is moved, saving huge memory bandwidth.</p>
+            <ul>
+                <li><b>Dequantization cost:</b> Adds about 6% extra arithmetic, but that's just a sliver of the overall time. Modern tensor cores <b>fuse scaling into GEMM</b> (as data loads into registers), so the net runtime hit is usually &lt;1%.</li>
+            </ul>
+            <h2>Hardware Support</h2>
+            <h3>MXFP4 Hardware</h3>
+            <ul>
+                <li>Available on NVIDIA Hopper (compute cap. 9.0+) & Blackwell datacenter/consumer GPUs (H100, H200, GH200, B100, B200, GB200, RTX 50-series/Pro).</li>
+                <li><b>Not supported on:</b> RTX 4090, A100, 3090. Newer tensor cores only.</li>
+            </ul>
+            <h3>NVFP4 Hardware</h3>
+            <ul>
+                <li><b>Blackwell-only (compute cap. 10.0+).</b> Uses new 5th-gen tensor cores for native FP4 and scale computation.</li>
+                <li>B100, B200, GB300, B300, RTX 50 series and above.</li>
+            </ul>
+            <h2>Drawbacks & Limitations</h2>
+            <ol>
+                <li><b>NVFP4’s very small block group makes traditional outlier techniques less effective.</b></li>
+                <li><b>MXFP4’s power-of-two scale can induce accuracy loss if block ranges are poorly matched, due to coarse scaling steps.</b></li>
+            </ol>
+            <h2>Proofs & Results</h2>
+            <ul>
+                <li>GPT-OSS models have been post-training quantized with MXFP4, showing strong accuracy and major speedups in inference.</li>
+                <li>Official model card: MXFP4 results (see below).</li>
+            </ul>
+            <p><b>Paste results/visuals here from referenced paper as proof points.</b></p>
+            <h2>References & Further Reading</h2>
+            <ul>
+                <li><a href="https://cdn.openai.com/pdf/419b6906-9da6-406c-a19d-1bb078ac7637/oai_gpt-oss_model_card.pdf" target="_blank" rel="noopener noreferrer">OpenAI GPT-OSS Model Card (Official, MXFP4 Accuracy Results)</a></li>
+                <li><a href="https://developer.nvidia.com/blog/introducing-nvfp4-for-efficient-and-accurate-low-precision-inference/" target="_blank" rel="noopener noreferrer">NVIDIA Developer Blog: Introducing NVFP4</a></li>
+                <li><a href="https://github.com/IST-DASLab/FP-Quant" target="_blank" rel="noopener noreferrer">Github: IST-DASLab/FP-Quant</a></li>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>
