@@ -278,7 +278,7 @@ code:not([class*="language-"]) { background-color: #fff2cf; color: #000000; padd
     width: 100%;
     aspect-ratio: 1 / 1;
     border-radius: 12px;
-    background: #ececec;
+    background: #fff;
     border: 1px solid rgba(0, 0, 0, 0.12);
 }
 
@@ -291,4 +291,22 @@ code:not([class*="language-"]) { background-color: #fff2cf; color: #000000; padd
         width: 70%;
         margin: 0 auto;
     }
+}
+
+.qa-toc {
+    margin: 36px 0 60px 0;
+    padding: 28px 32px 28px 24px;
+    background: #fff;
+    border-left: 7px solid #d5b77f;
+    border-radius: 10px;
+}
+.question {
+    display: block;
+    background: #fff;
+    font-weight: bold;
+    font-size: 1.27em;
+    padding: 22px 32px 18px 20px;
+    border-radius: 8px;
+    margin: 52px 0 28px 0;
+    line-height: 1.43;
 }
