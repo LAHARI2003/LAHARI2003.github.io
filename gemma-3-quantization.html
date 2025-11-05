@@ -14,8 +14,9 @@
 
             <p>
                 These are my notes from turning <code>google/gemma-3-270m-it</code> into locally saved FP32, 8-bit, and 4-bit checkpoints,
-                then digging through the resulting <code>.safetensors</code> payloads to understand what changes with quantization. The work lives in
-                <code>formatted_code.ipynb</code>; this post captures the highlights, observations, and the “so what?” moments.
+                then digging through the resulting <code>.safetensors</code> payloads to understand what changes with quantization. The refreshed
+                implementation now lives in <code>formatted_code copy.ipynb</code>, where I’ve folded in a few more diagnostics; this post captures the
+                highlights, observations, and the “so what?” moments.
             </p>
 
             <h2>Workflow Highlights</h2>
@@ -187,17 +188,124 @@ model_int4 = Gemma3ForCausalLM.from_pretrained(model_id, quantization_config=bnb
                 comment about this behavior.
             </p>
 
+            <h2>State-Dict Drift Explorer</h2>
+            <p>
+                The updated notebook adds a lightweight diff utility that loads both checkpoints into Python dictionaries and reports how each tensor
+                shifts after quantization. It buckets parameters by layer type, computes norms/maximum deltas, and surfaces the largest deviations:
+            </p>
+
+            <ul>
+                <li><code>load_safetensors_to_dict</code> pulls every tensor onto CPU for side-by-side comparisons.</li>
+                <li><code>compare_state_dicts</code> evaluates L<sub>2</sub>, relative L<sub>2</sub>, max absolute error, and cosine similarity per tensor.</li>
+                <li><code>report_top_changes</code> and <code>aggregate_by_type</code> summarise the noisiest tensors and the average drift per functional block.</li>
+            </ul>
+
+            <table class="data-table">
+                <caption style="caption-side: bottom; text-align: left; font-size: 0.85rem; padding-top: 6px;">Top 5 tensors by relative L<sub>2</sub> difference (FP32 vs. int8)</caption>
+                <thead>
+                    <tr>
+                        <th>Tensor</th>
+                        <th>Layer type</th>
+                        <th>Relative L<sub>2</sub></th>
+                        <th>Max |Δ|</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><code>model.layers.14.mlp.down_proj.weight</code></td>
+                        <td>Feedforward</td>
+                        <td>2.42 × 10<sup>3</sup></td>
+                        <td>1.27 × 10<sup>2</sup></td>
+                    </tr>
+                    <tr>
+                        <td><code>model.layers.1.mlp.down_proj.weight</code></td>
+                        <td>Feedforward</td>
+                        <td>2.36 × 10<sup>3</sup></td>
+                        <td>1.27 × 10<sup>2</sup></td>
+                    </tr>
+                    <tr>
+                        <td><code>model.layers.4.mlp.down_proj.weight</code></td>
+                        <td>Feedforward</td>
+                        <td>2.35 × 10<sup>3</sup></td>
+                        <td>1.27 × 10<sup>2</sup></td>
+                    </tr>
+                    <tr>
+                        <td><code>model.layers.8.mlp.down_proj.weight</code></td>
+                        <td>Feedforward</td>
+                        <td>2.18 × 10<sup>3</sup></td>
+                        <td>1.27 × 10<sup>2</sup></td>
+                    </tr>
+                    <tr>
+                        <td><code>model.layers.13.mlp.down_proj.weight</code></td>
+                        <td>Feedforward</td>
+                        <td>2.18 × 10<sup>3</sup></td>
+                        <td>1.27 × 10<sup>2</sup></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <table class="data-table">
+                <caption style="caption-side: bottom; text-align: left; font-size: 0.85rem; padding-top: 6px;">Average drift metrics by functional block</caption>
+                <thead>
+                    <tr>
+                        <th>Layer type</th>
+                        <th>Tensor count</th>
+                        <th>Avg. relative L<sub>2</sub></th>
+                        <th>Avg. max |Δ|</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Embedding</td>
+                        <td>1</td>
+                        <td>6.67 × 10<sup>-9</sup></td>
+                        <td>2.98 × 10<sup>-8</sup></td>
+                    </tr>
+                    <tr>
+                        <td>LayerNorm</td>
+                        <td>54</td>
+                        <td>≈ 0.0</td>
+                        <td>≈ 0.0</td>
+                    </tr>
+                    <tr>
+                        <td>Feedforward</td>
+                        <td>54</td>
+                        <td>1.24 × 10<sup>3</sup></td>
+                        <td>1.27 × 10<sup>2</sup></td>
+                    </tr>
+                    <tr>
+                        <td>Attention</td>
+                        <td>126</td>
+                        <td>5.37 × 10<sup>2</sup></td>
+                        <td>7.25 × 10<sup>1</sup></td>
+                    </tr>
+                    <tr>
+                        <td>Other</td>
+                        <td>1</td>
+                        <td>≈ 0.0</td>
+                        <td>≈ 0.0</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                Large relative L<sub>2</sub> values for MLP and attention blocks are expected—the int8 tensors are stored as signed bytes, so comparing them
+                directly to FP32 weights exaggerates the difference unless they are dequantized first. Still, the report is handy for spotting structural
+                mismatches (missing tensors, unexpected dtypes, or metadata that fails to deserialize cleanly).
+            </p>
+
             <h2>Takeaways</h2>
             <ul>
                 <li>Saving int8/FP4 checkpoints locally is straightforward and greatly reduces footprint, even without GPU access.</li>
                 <li>Inspecting <code>.safetensors</code> is invaluable for understanding how quantization metadata is organized—especially when debugging custom loaders.</li>
                 <li>CPU-only deployments need specialized kernels (e.g., <code>ggml</code>/<code>llama.cpp</code> style) to see speedups; <code>bitsandbytes</code> alone is not enough.</li>
                 <li>The reconstructed int8 weights align closely with FP32, suggesting that accuracy regressions (if any) will be dominated by downstream effects, not tensor corruption.</li>
+                <li>The new diff utility makes it easy to regression-test future quantization runs and catch drift beyond expected int8 scaling noise.</li>
                 <li>Next step: run the same experiment on a CUDA-capable device to quantify the latency gains and extend the evaluation to 4-bit inference.</li>
             </ul>
 
             <p>
-                If you want to reproduce or extend any portion, check out <code>formatted_code.ipynb</code>; it contains the full scripts, tensor dumps,
+                If you want to reproduce or extend any portion, open <code>formatted_code copy.ipynb</code>; it contains the full scripts, tensor dumps,
                 and translation demos used here.
             </p>
         </div>
