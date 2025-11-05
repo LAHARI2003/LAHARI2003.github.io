@@ -310,3 +310,27 @@ code:not([class*="language-"]) { background-color: #fff2cf; color: #000000; padd
     margin: 52px 0 28px 0;
     line-height: 1.43;
 }
+
+/* Simple table styling for data-heavy posts */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 24px 0;
+    font-size: 0.95rem;
+}
+
+.data-table thead {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.data-table th,
+.data-table td {
+    border: 1px solid rgba(0, 0, 0, 0.15);
+    padding: 10px 14px;
+    text-align: left;
+    vertical-align: top;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: rgba(0, 0, 0, 0.02);
+}

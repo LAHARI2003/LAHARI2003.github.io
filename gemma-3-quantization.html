@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gemma 3 270M Quantization Notes</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="content-box">
+            <h1 class="page-title">Quantizing Gemma&nbsp;3&nbsp;270M and Inspecting the Checkpoints</h1>
+            <div style="margin-bottom:24px"><a class="nav-link" href="blog.html">← Back to Blog</a></div>
+
+            <p>
+                These are my notes from turning <code>google/gemma-3-270m-it</code> into locally saved FP32, 8-bit, and 4-bit checkpoints,
+                then digging through the resulting <code>.safetensors</code> payloads to understand what changes with quantization. The work lives in
+                <code>formatted_code.ipynb</code>; this post captures the highlights, observations, and the “so what?” moments.
+            </p>
+
+            <h2>Workflow Highlights</h2>
+            <ul>
+                <li>Loaded the instruction-tuned Gemma 3 270M model in full precision alongside 8-bit and 4-bit <code>bitsandbytes</code> variants.</li>
+                <li>Persisted all three artifacts plus the tokenizer to disk for repeatable offline experiments.</li>
+                <li>Used <code>safetensors.safe_open</code> to enumerate every tensor and compare the structures created by each quantization scheme.</li>
+                <li>Validated that dequantizing the int8 weights (per-row scaling) closely matches the FP32 originals.</li>
+                <li>Benchmarked memory footprint and CPU inference timing to measure the practical impact of quantization without CUDA kernels.</li>
+            </ul>
+
+            <h2>Environment Setup</h2>
+            <p>
+                Everything ran inside a local Python&nbsp;3.13 environment with <code>transformers</code>, <code>torch</code>,
+                <code>bitsandbytes</code>, and <code>safetensors</code> installed. The loader snippet that creates the three variants looks like this:
+            </p>
+
+<pre><code class="language-python">from transformers import AutoTokenizer, BitsAndBytesConfig, Gemma3ForCausalLM
+
+model_id = "google/gemma-3-270m-it"
+
+tokenizer = AutoTokenizer.from_pretrained(model_id)
+model_fp32 = Gemma3ForCausalLM.from_pretrained(model_id).eval()
+
+bnb_8bit = BitsAndBytesConfig(load_in_8bit=True)
+model_int8 = Gemma3ForCausalLM.from_pretrained(model_id, quantization_config=bnb_8bit).eval()
+
+bnb_4bit = BitsAndBytesConfig(load_in_4bit=True)
+model_int4 = Gemma3ForCausalLM.from_pretrained(model_id, quantization_config=bnb_4bit).eval()</code></pre>
+
+            <p>
+                Once loaded, I saved each variant with <code>save_pretrained</code> so that downstream experiments could run without touching the network.
+            </p>
+
+            <h2>Peeking Inside the <code>.safetensors</code> Files</h2>
+            <p>
+                Enumerating every key with <code>safe_open</code> surfaced how quantization restructures the checkpoints:
+            </p>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Checkpoint</th>
+                        <th>Tensors stored</th>
+                        <th>Notable additions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>FP32</td>
+                        <td>236</td>
+                        <td>Only raw weights/biases in <code>float32</code>.</td>
+                    </tr>
+                    <tr>
+                        <td>8-bit</td>
+                        <td>488</td>
+                        <td><code>.SCB</code> scale vectors per row and <code>.weight_format</code> metadata alongside int8 matrices.</td>
+                    </tr>
+                    <tr>
+                        <td>4-bit</td>
+                        <td>614</td>
+                        <td>Per-block <code>absmax</code>, <code>quant_map</code>, and <code>quant_state</code> tensors required by FP4 kernels.</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                Seeing the auxiliary tensors spelled out made the storage overhead tangible—the total tensor count nearly doubles for int8
+                and grows even further for FP4 because each block needs its own scale and LUT state.
+            </p>
+
+            <h2>Verifying the Int8 Reconstruction</h2>
+            <p>
+                To sanity-check the int8 weights, I manually dequantized <code>model.layers.0.mlp.down_proj.weight</code> using the saved
+                per-row scale (<code>.SCB</code>) and confirmed that the reconstruction is numerically close to FP32:
+            </p>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Mean absolute difference</td>
+                        <td>1.78 × 10<sup>-4</sup></td>
+                    </tr>
+                    <tr>
+                        <td>Max absolute difference</td>
+                        <td>2.89 × 10<sup>-3</sup></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                The first few reconstructed values match the FP32 tensor to three decimal places—good evidence that the metadata in
+                the checkpoint is internally consistent.
+            </p>
+
+            <h2>Memory Footprint Comparison</h2>
+            <p>
+                Calling <code>get_memory_footprint()</code> on each variant produced the following (bytes):
+            </p>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Model</th>
+                        <th>Bytes</th>
+                        <th>Approx.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>FP32</td>
+                        <td>1,072,393,732</td>
+                        <td>~1.00&nbsp;GB</td>
+                    </tr>
+                    <tr>
+                        <td>8-bit</td>
+                        <td>435,927,298</td>
+                        <td>~416&nbsp;MB</td>
+                    </tr>
+                    <tr>
+                        <td>4-bit</td>
+                        <td>385,792,258</td>
+                        <td>~368&nbsp;MB</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                Int8 cuts memory by roughly 59% relative to FP32; FP4 buys an extra ~12% on top of that. Those numbers matter when the target is a
+                constrained device or when multiple models must coexist on the same machine.
+            </p>
+
+            <h2>CPU Inference Experiment</h2>
+            <p>
+                I also compared greedy decoding on CPU for a short prompt (“Once upon a time”). The int8 model was actually slower:
+            </p>
+
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Variant</th>
+                        <th>Latency (s)</th>
+                        <th>Output snippet</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>FP32</td>
+                        <td>2.37</td>
+                        <td>“Once upon a time, there was a small, unassuming house...”</td>
+                    </tr>
+                    <tr>
+                        <td>8-bit</td>
+                        <td>3.42</td>
+                        <td>“Once upon a time”</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p>
+                <strong>Why slower?</strong> <code>bitsandbytes</code> exposes convenient loaders on CPU, but its optimized matmul kernels are CUDA-only. On the host
+                it falls back to dequantizing on the fly, so we keep the memory win but lose the runtime advantage. The notebook includes a cautionary
+                comment about this behavior.
+            </p>
+
+            <h2>Takeaways</h2>
+            <ul>
+                <li>Saving int8/FP4 checkpoints locally is straightforward and greatly reduces footprint, even without GPU access.</li>
+                <li>Inspecting <code>.safetensors</code> is invaluable for understanding how quantization metadata is organized—especially when debugging custom loaders.</li>
+                <li>CPU-only deployments need specialized kernels (e.g., <code>ggml</code>/<code>llama.cpp</code> style) to see speedups; <code>bitsandbytes</code> alone is not enough.</li>
+                <li>The reconstructed int8 weights align closely with FP32, suggesting that accuracy regressions (if any) will be dominated by downstream effects, not tensor corruption.</li>
+                <li>Next step: run the same experiment on a CUDA-capable device to quantify the latency gains and extend the evaluation to 4-bit inference.</li>
+            </ul>
+
+            <p>
+                If you want to reproduce or extend any portion, check out <code>formatted_code.ipynb</code>; it contains the full scripts, tensor dumps,
+                and translation demos used here.
+            </p>
+        </div>
+    </div>
+</body>
+</html>
+
