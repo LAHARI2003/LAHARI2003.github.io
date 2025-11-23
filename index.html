@@ -20,6 +20,13 @@
                     <img src="mail.png" alt="gmail" class="nav-icon" />
                     <span>Email</span>
                 </a>
+                <a href="#projects" class="nav-link">
+                    <!-- Simple folder/code icon SVG -->
+                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    <span>Projects</span>
+                </a>
                 <a href="blog.html" class="nav-link">
                     <img src="blog.png" alt="Blog" class="nav-icon" />
                     <span>Blog</span>
@@ -27,6 +34,14 @@
                 <a href="https://github.com/LAHARI2003" class="nav-link" target="_blank">
                     <img src="github.jpg" alt="github" class="nav-icon" />
                     <span>GitHub</span>
+                </a>
+                <a href="#" class="nav-link" title="Download CV">
+                   <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>CV</span>
                 </a>
             </div>
         </header>
@@ -66,6 +81,78 @@
                 than through traditional static optimization. At its core, my research strives for sustainability through efficiency, aligning
                 closely with the vision of energy-conscious computation.
             </p>
+        </section>
+
+        <section id="projects" class="pubs-section" style="margin-top: 40px;">
+            <h2>Research Implementations</h2>
+            <p style="margin-bottom: 24px; color: #555;">
+                Core research projects and experimental frameworks driving my exploration of efficient edge intelligence.
+            </p>
+            <div class="pub-grid">
+                <div class="pub-item">
+                    <div class="pub-title">InvGuard: Agentic AI for Smart Contract Security</div>
+                    <div class="pub-venue">Independent Research</div>
+                    <p style="font-size: 0.95rem; margin-bottom: 10px;">
+                        Designed a multi-agent AI system for autonomous vulnerability detection & repair in smart contracts. 
+                        Developed modules for end-to-end invariant synthesis & patching, achieving <strong>96.2% invariant precision</strong> 
+                        and mitigating 74/91 real-world exploits.
+                    </p>
+                    <div class="pub-links">
+                        <span style="font-size: 0.85rem; color: #666;">Technologies: Multi-Agent Systems, LLMs, Security Auditing</span>
+                    </div>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-title">Generative AI for HLS Optimization & Verification</div>
+                    <div class="pub-venue">STMicroelectronics (Internship)</div>
+                    <p style="font-size: 0.95rem; margin-bottom: 10px;">
+                        Built an end-to-end pipeline for Design Space Optimization (DSO) using generative AI. 
+                        Optimized accelerator-level C++ code for synthesis to improve PPA metrics and automated 
+                        UVM testbench generation for verification coverage closure.
+                    </p>
+                    <div class="pub-links">
+                        <span style="font-size: 0.85rem; color: #666;">Technologies: HLS, C++, UVM, Generative AI</span>
+                    </div>
+                </div>
+
+                <div class="pub-item">
+                    <div class="pub-title">Real-time Driver Behavior Analysis</div>
+                    <div class="pub-venue">IIT Hyderabad (Research Internship)</div>
+                    <p style="font-size: 0.95rem; margin-bottom: 10px;">
+                        Developed a behavior analysis pipeline using PCA (82% variance) and K-Means clustering. 
+                        Proposed a novel "Lateral Shift Ratio" metric for lane-keeping stability and classified driving events 
+                        into behavioral clusters with ANOVA-based validation.
+                    </p>
+                    <div class="pub-links">
+                        <span style="font-size: 0.85rem; color: #666;">Technologies: PCA, K-Means, Statistical Analysis</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="pubs-section" style="margin-top: 40px;">
+            <h2>Foundational Readings</h2>
+            <p style="margin-bottom: 20px; font-style: italic; color: #555;">A curated list of papers shaping my current research direction.</p>
+            
+            <div class="pub-item" style="border-left-color: #555;">
+                <div class="pub-title">Efficient Edge Inference & ELMs</div>
+                <ul style="list-style: none; padding-left: 0; margin-top: 10px; font-size: 0.95rem;">
+                    <li style="margin-bottom: 8px;">
+                        <strong>[Paper Title Placeholder]</strong> - <em>Why it matters:</em> [Your annotation here...]
+                    </li>
+                    <li>
+                        <strong>[Paper Title Placeholder]</strong> - <em>Why it matters:</em> [Your annotation here...]
+                    </li>
+                </ul>
+            </div>
+             <div class="pub-item" style="border-left-color: #555;">
+                <div class="pub-title">State-Space Models (Mamba/SSMs)</div>
+                <ul style="list-style: none; padding-left: 0; margin-top: 10px; font-size: 0.95rem;">
+                    <li style="margin-bottom: 8px;">
+                        <strong>[Paper Title Placeholder]</strong> - <em>Why it matters:</em> [Your annotation here...]
+                    </li>
+                </ul>
+            </div>
         </section>
 
         <section class="pubs-section">

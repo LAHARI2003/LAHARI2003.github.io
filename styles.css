@@ -61,12 +61,14 @@ header {
 }
 
 .name, .page-title {
-    font-size: 3.5rem;
-    margin-bottom: 16px;
-    letter-spacing: -0.5px;
-    background: linear-gradient(45deg, #1a1a1a, #4a4a4a);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+    font-family: 'Playfair Display', serif;
+    font-size: 3rem;
+    font-weight: 500;
+    margin-bottom: 12px;
+    letter-spacing: 1px;
+    color: #1a1a1a;
+    background: none;
+    -webkit-text-fill-color: initial;
 }
 
 .tagline {
