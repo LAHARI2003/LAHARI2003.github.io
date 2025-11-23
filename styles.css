@@ -2,8 +2,8 @@
 :root {
     --bg-color: #fdfbf7; /* Warm off-white/cream */
     --text-color: #2c2c2c;
-    --accent-color: #8a2be2; /* Keeping existing accent */
-    --accent-hover: #6d22b3;
+    --accent-color: #006d77; /* Deep Teal */
+    --accent-hover: #004d55;
     --secondary-text: #555;
     --border-color: #e0e0e0;
     --card-bg: #ffffff;
