@@ -4,34 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rebuilding Gemma&nbsp;3&nbsp;270M Locally</title>
+    <meta name="description" content="From-scratch, fully transparent export and quantization pipeline for Gemma 3 270M: FP32, int8, and FP4 checkpoints, drift analysis, and CPU inference notes.">
+    <meta name="author" content="Portfolio Experiments">
+    <meta name="robots" content="index,follow">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <div class="content-box">
-            <h1 class="page-title">Rebuilding Gemma&nbsp;3&nbsp;270M Locally: Quantization, Introspection, Drift</h1>
-            <div style="margin-bottom:24px"><a class="nav-link" href="blog.html">← Back to Blog</a></div>
+            <header class="post-header">
+                <div class="post-header-top">
+                    <a class="nav-link nav-link-back" href="blog.html">← Back to Blog</a>
+                </div>
+                <p class="post-meta">
+                    Gemma&nbsp;3 • 270M • Quantization &amp; drift analysis • CPU-only Windows build
+                </p>
+                <h1 class="page-title">Rebuilding Gemma&nbsp;3&nbsp;270M Locally: Quantization, Introspection, Drift</h1>
+                <p class="post-subtitle">
+                    A from-scratch, fully transparent export pipeline for Gemma&nbsp;3&nbsp;270M—FP32, int8, and FP4—plus tools to prove the
+                    quantized checkpoints really reconstruct what you think they do.
+                </p>
+            </header>
 
-            <p>
-                I tore down and rewrote the Gemma 3 270M quantization notebook (<code>formatted_code.ipynb</code>) so I could own the full
-                export pipeline—no hidden helper scripts, no unexplained tensors. This post is a clean retelling of that build, from grabbing the
-                instruction-tuned weights to proving the quantized checkpoints reconstruct exactly what I expect.
-            </p>
+            <aside class="post-toc">
+                <h2 class="toc-title">On this page</h2>
+                <ol>
+                    <li><a href="#notebook-scope">What the new notebook covers</a></li>
+                    <li><a href="#setup-replica">Setting up the replica</a></li>
+                    <li><a href="#checkpoint-introspection">Peeking inside the checkpoints</a></li>
+                    <li><a href="#int8-reconstruction">Does int8 really reconstruct FP32?</a></li>
+                    <li><a href="#memory-footprint">Memory footprint reality check</a></li>
+                    <li><a href="#cpu-inference">Inference on CPU</a></li>
+                    <li><a href="#drift-explorer">The drift explorer module</a></li>
+                    <li><a href="#smoke-tests">Mini translation smoke tests</a></li>
+                    <li><a href="#takeaways">Takeaways &amp; next steps</a></li>
+                </ol>
+            </aside>
 
-            <h2>What the New Notebook Covers</h2>
-            <ul>
-                <li><strong>Three-way export:</strong> raw FP32, <code>bitsandbytes</code> int8, and FP4 checkpoints saved locally with matching tokenizer.</li>
-                <li><strong>Tensor spelunking:</strong> full inventory of every <code>.safetensors</code> key for each precision level.</li>
-                <li><strong>Edge sanity checks:</strong> manual dequantization of int8 matrices and tiny translation prompts to make sure generation still works.</li>
-                <li><strong>State-diff tooling:</strong> a reusable module that quantifies how much each tensor moves after quantization.</li>
-            </ul>
+            <main class="post-body">
+                <section id="introduction">
+                    <p>
+                        I tore down and rewrote the Gemma&nbsp;3 270M quantization notebook (<code>formatted_code.ipynb</code>) so I could own the full
+                        export pipeline—no hidden helper scripts, no unexplained tensors. This post is a clean retelling of that build, from grabbing the
+                        instruction-tuned weights to proving the quantized checkpoints reconstruct exactly what I expect.
+                    </p>
+                    <p>
+                        Think of it as a reproducible recipe: start from the official model card, end with locally saved FP32, int8, and FP4 checkpoints,
+                        plus tooling to measure how much each tensor drifts along the way.
+                    </p>
+                </section>
 
-            <h2>Setting Up the Replica</h2>
-            <p>
-                Everything runs on a CPU-only Windows box with Python&nbsp;3.13, <code>transformers</code> 4.44, <code>torch</code> 2.5,
-                <code>bitsandbytes</code>, and <code>safetensors</code>. The core loader is intentionally explicit—every variant is constructed
-                in plain sight:
-            </p>
+                <section id="notebook-scope">
+                    <h2>What the New Notebook Covers</h2>
+                    <ul>
+                        <li><strong>Three-way export:</strong> raw FP32, <code>bitsandbytes</code> int8, and FP4 checkpoints saved locally with matching tokenizer.</li>
+                        <li><strong>Tensor spelunking:</strong> full inventory of every <code>.safetensors</code> key for each precision level.</li>
+                        <li><strong>Edge sanity checks:</strong> manual dequantization of int8 matrices and tiny translation prompts to make sure generation still works.</li>
+                        <li><strong>State-diff tooling:</strong> a reusable module that quantifies how much each tensor moves after quantization.</li>
+                    </ul>
+                </section>
+
+                <section id="setup-replica">
+                    <h2>Setting Up the Replica</h2>
+                    <p>
+                        Everything runs on a CPU-only Windows box with Python&nbsp;3.13, <code>transformers</code> 4.44, <code>torch</code> 2.5,
+                        <code>bitsandbytes</code>, and <code>safetensors</code>. The core loader is intentionally explicit—every variant is constructed
+                        in plain sight:
+                    </p>
 
 <pre><code class="language-python">from transformers import AutoTokenizer, BitsAndBytesConfig, Gemma3ForCausalLM
 
@@ -46,274 +85,290 @@ model_int8 = Gemma3ForCausalLM.from_pretrained(model_id, quantization_config=bnb
 bnb_int4 = BitsAndBytesConfig(load_in_4bit=True)
 model_int4 = Gemma3ForCausalLM.from_pretrained(model_id, quantization_config=bnb_int4).eval()</code></pre>
 
-            <p>
-                Once loaded, each artifact is pushed to disk with <code>save_pretrained</code>. That gives me local, versionable folders for the tokenizer,
-                the FP32 checkpoint, and both quantized variants.
-            </p>
+                    <p>
+                        Once loaded, each artifact is pushed to disk with <code>save_pretrained</code>. That gives me local, versionable folders for the tokenizer,
+                        the FP32 checkpoint, and both quantized variants.
+                    </p>
+                </section>
 
-            <h2>Peeking Inside the Checkpoints</h2>
-            <p>
-                Dumping the <code>.safetensors</code> structures was the first “aha”—the count of stored tensors balloons because quantization drags
-                along metadata. The notebook prints every entry; the summary below shows the punchline.
-            </p>
+                <section id="checkpoint-introspection">
+                    <h2>Peeking Inside the Checkpoints</h2>
+                    <p>
+                        Dumping the <code>.safetensors</code> structures was the first “aha”—the count of stored tensors balloons because quantization drags
+                        along metadata. The notebook prints every entry; the summary below shows the punchline.
+                    </p>
 
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Variant</th>
-                        <th>Tensors stored</th>
-                        <th>Extra baggage</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>FP32</td>
-                        <td>236</td>
-                        <td>Nothing fancy—pure <code>float32</code> weights and biases.</td>
-                    </tr>
-                    <tr>
-                        <td>Int8</td>
-                        <td>488</td>
-                        <td>Per-row scale vectors (<code>.SCB</code>) and one-byte <code>.weight_format</code> flags.</td>
-                    </tr>
-                    <tr>
-                        <td>FP4</td>
-                        <td>614</td>
-                        <td>Block-level <code>absmax</code>, <code>quant_map</code>, and <code>quant_state</code> tensors for FP4 kernels.</td>
-                    </tr>
-                </tbody>
-            </table>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Variant</th>
+                                <th>Tensors stored</th>
+                                <th>Extra baggage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>FP32</td>
+                                <td>236</td>
+                                <td>Nothing fancy—pure <code>float32</code> weights and biases.</td>
+                            </tr>
+                            <tr>
+                                <td>Int8</td>
+                                <td>488</td>
+                                <td>Per-row scale vectors (<code>.SCB</code>) and one-byte <code>.weight_format</code> flags.</td>
+                            </tr>
+                            <tr>
+                                <td>FP4</td>
+                                <td>614</td>
+                                <td>Block-level <code>absmax</code>, <code>quant_map</code>, and <code>quant_state</code> tensors for FP4 kernels.</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-            <p>
-                Having the raw dumps in the notebook makes debugging painless—you can search for any tensor name and inspect the dtype/shape directly.
-            </p>
+                    <p>
+                        Having the raw dumps in the notebook makes debugging painless—you can search for any tensor name and inspect the dtype/shape directly.
+                    </p>
+                </section>
 
-            <h2>Does Int8 Really Reconstruct FP32?</h2>
-            <p>
-                To answer that, the notebook pulls <code>model.layers.0.mlp.down_proj.weight</code> from both checkpoints, applies the saved
-                per-row scales, and compares them element-wise. The alignment is tight.
-            </p>
+                <section id="int8-reconstruction">
+                    <h2>Does Int8 Really Reconstruct FP32?</h2>
+                    <p>
+                        To answer that, the notebook pulls <code>model.layers.0.mlp.down_proj.weight</code> from both checkpoints, applies the saved
+                        per-row scales, and compares them element-wise. The alignment is tight.
+                    </p>
 
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Metric</th>
-                        <th>Value</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Mean |Δ|</td>
-                        <td>1.78 × 10<sup>-4</sup></td>
-                    </tr>
-                    <tr>
-                        <td>Max |Δ|</td>
-                        <td>2.89 × 10<sup>-3</sup></td>
-                    </tr>
-                    <tr>
-                        <td>First 10 reconstructed values</td>
-                        <td><code>[0.0024, 0.0126, -0.0150, …]</code> vs. FP32 <code>[0.0026, 0.0125, -0.0148, …]</code></td>
-                    </tr>
-                </tbody>
-            </table>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Metric</th>
+                                <th>Value</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Mean |Δ|</td>
+                                <td>1.78 × 10<sup>-4</sup></td>
+                            </tr>
+                            <tr>
+                                <td>Max |Δ|</td>
+                                <td>2.89 × 10<sup>-3</sup></td>
+                            </tr>
+                            <tr>
+                                <td>First 10 reconstructed values</td>
+                                <td><code>[0.0024, 0.0126, -0.0150, …]</code> vs. FP32 <code>[0.0026, 0.0125, -0.0148, …]</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-            <p>
-                That check runs for any tensor you care about—swap the key, re-run, and you get the same reconstruction guarantees.
-            </p>
+                    <p>
+                        That check runs for any tensor you care about—swap the key, re-run, and you get the same reconstruction guarantees.
+                    </p>
+                </section>
 
-            <h2>Memory Footprint Reality Check</h2>
-            <p>
-                <code>get_memory_footprint()</code> makes the storage trade-offs obvious:
-            </p>
+                <section id="memory-footprint">
+                    <h2>Memory Footprint Reality Check</h2>
+                    <p>
+                        <code>get_memory_footprint()</code> makes the storage trade-offs obvious:
+                    </p>
 
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Model</th>
-                        <th>Bytes on Disk</th>
-                        <th>Approx.</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>FP32</td>
-                        <td>1,072,393,732</td>
-                        <td>≈ 1.00&nbsp;GB</td>
-                    </tr>
-                    <tr>
-                        <td>Int8</td>
-                        <td>435,927,298</td>
-                        <td>≈ 416&nbsp;MB</td>
-                    </tr>
-                    <tr>
-                        <td>FP4</td>
-                        <td>385,792,258</td>
-                        <td>≈ 368&nbsp;MB</td>
-                    </tr>
-                </tbody>
-            </table>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Model</th>
+                                <th>Bytes on Disk</th>
+                                <th>Approx.</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>FP32</td>
+                                <td>1,072,393,732</td>
+                                <td>≈ 1.00&nbsp;GB</td>
+                            </tr>
+                            <tr>
+                                <td>Int8</td>
+                                <td>435,927,298</td>
+                                <td>≈ 416&nbsp;MB</td>
+                            </tr>
+                            <tr>
+                                <td>FP4</td>
+                                <td>385,792,258</td>
+                                <td>≈ 368&nbsp;MB</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-            <p>
-                Int8 drops the footprint by ~59%. FP4 squeezes another ~12% off that. Perfect for shipping to edge devices or cramming multiple
-                models onto one workstation SSD.
-            </p>
+                    <p>
+                        Int8 drops the footprint by ~59%. FP4 squeezes another ~12% off that. Perfect for shipping to edge devices or cramming multiple
+                        models onto one workstation SSD.
+                    </p>
+                </section>
 
-            <h2>Inference on CPU (Satisfying Curiosity)</h2>
-            <p>
-                I benchmarked greedy decoding for a toy prompt just to see what happens without CUDA kernels. Spoiler: the int8 model is slower on CPU
-                because <code>bitsandbytes</code> falls back to dequantizing weights before matmuls.
-            </p>
+                <section id="cpu-inference">
+                    <h2>Inference on CPU (Satisfying Curiosity)</h2>
+                    <p>
+                        I benchmarked greedy decoding for a toy prompt just to see what happens without CUDA kernels. Spoiler: the int8 model is slower on CPU
+                        because <code>bitsandbytes</code> falls back to dequantizing weights before matmuls.
+                    </p>
 
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>Variant</th>
-                        <th>Latency (s)</th>
-                        <th>Sample Output</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>FP32</td>
-                        <td>11.56</td>
-                        <td>“Once upon a time, there was a small, unassuming house…”</td>
-                    </tr>
-                    <tr>
-                        <td>Int8</td>
-                        <td>25.23</td>
-                        <td>“Once upon a time”</td>
-                    </tr>
-                </tbody>
-            </table>
+                    <table class="data-table">
+                        <thead>
+                            <tr>
+                                <th>Variant</th>
+                                <th>Latency (s)</th>
+                                <th>Sample Output</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>FP32</td>
+                                <td>11.56</td>
+                                <td>“Once upon a time, there was a small, unassuming house…”</td>
+                            </tr>
+                            <tr>
+                                <td>Int8</td>
+                                <td>25.23</td>
+                                <td>“Once upon a time”</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-            <p>
-                That’s why the notebook drops a reminder: for real latency wins you need GPU-aware kernels (CUDA, ROCm) or a CPU-native runtime such as
-                <code>ggml</code>/<code>llama.cpp</code>.
-            </p>
+                    <p>
+                        That’s why the notebook drops a reminder: for real latency wins you need GPU-aware kernels (CUDA, ROCm) or a CPU-native runtime such as
+                        <code>ggml</code>/<code>llama.cpp</code>.
+                    </p>
+                </section>
 
-            <h2>The Drift Explorer Module</h2>
-            <p>
-                The biggest addition is a standalone comparison toolkit. It loads both checkpoints into dictionaries, dequantizes any int8 tensors,
-                and reports per-tensor error metrics plus aggregated statistics.
-            </p>
+                <section id="drift-explorer">
+                    <h2>The Drift Explorer Module</h2>
+                    <p>
+                        The biggest addition is a standalone comparison toolkit. It loads both checkpoints into dictionaries, dequantizes any int8 tensors,
+                        and reports per-tensor error metrics plus aggregated statistics.
+                    </p>
 
-            <ul>
-                <li><code>load_safetensors_to_dict</code> handles the dtype juggling and optional dequantization.</li>
-                <li><code>compare_state_dicts</code> returns a result map with L<sub>2</sub>, relative L<sub>2</sub>, max |Δ|, cosine similarity, and KL divergence.</li>
-                <li><code>report_top_changes</code> and <code>aggregate_by_type</code> expose the loudest tensors and per-layer averages.</li>
-            </ul>
+                    <ul>
+                        <li><code>load_safetensors_to_dict</code> handles the dtype juggling and optional dequantization.</li>
+                        <li><code>compare_state_dicts</code> returns a result map with L<sub>2</sub>, relative L<sub>2</sub>, max |Δ|, cosine similarity, and KL divergence.</li>
+                        <li><code>report_top_changes</code> and <code>aggregate_by_type</code> expose the loudest tensors and per-layer averages.</li>
+                    </ul>
 
-            <table class="data-table">
-                <caption style="caption-side: bottom; text-align: left; font-size: 0.85rem; padding-top: 6px;">Top-5 tensors by relative L<sub>2</sub> (FP32 vs. Int8)</caption>
-                <thead>
-                    <tr>
-                        <th>Tensor</th>
-                        <th>Layer type</th>
-                        <th>Relative L<sub>2</sub></th>
-                        <th>Max |Δ|</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><code>model.layers.5.self_attn.k_proj.weight</code></td>
-                        <td>Attention</td>
-                        <td>1.40 × 10<sup>-2</sup></td>
-                        <td>2.40 × 10<sup>-3</sup></td>
-                    </tr>
-                    <tr>
-                        <td><code>model.layers.12.mlp.down_proj.weight</code></td>
-                        <td>Feedforward</td>
-                        <td>1.27 × 10<sup>-2</sup></td>
-                        <td>1.62 × 10<sup>-3</sup></td>
-                    </tr>
-                    <tr>
-                        <td><code>model.layers.5.mlp.down_proj.weight</code></td>
-                        <td>Feedforward</td>
-                        <td>1.26 × 10<sup>-2</sup></td>
-                        <td>2.90 × 10<sup>-3</sup></td>
-                    </tr>
-                    <tr>
-                        <td><code>model.layers.9.mlp.down_proj.weight</code></td>
-                        <td>Feedforward</td>
-                        <td>1.23 × 10<sup>-2</sup></td>
-                        <td>1.47 × 10<sup>-3</sup></td>
-                    </tr>
-                    <tr>
-                        <td><code>model.layers.6.mlp.down_proj.weight</code></td>
-                        <td>Feedforward</td>
-                        <td>1.20 × 10<sup>-2</sup></td>
-                        <td>1.44 × 10<sup>-3</sup></td>
-                    </tr>
-                </tbody>
-            </table>
+                    <table class="data-table">
+                        <caption style="caption-side: bottom; text-align: left; font-size: 0.85rem; padding-top: 6px;">Top-5 tensors by relative L<sub>2</sub> (FP32 vs. Int8)</caption>
+                        <thead>
+                            <tr>
+                                <th>Tensor</th>
+                                <th>Layer type</th>
+                                <th>Relative L<sub>2</sub></th>
+                                <th>Max |Δ|</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>model.layers.5.self_attn.k_proj.weight</code></td>
+                                <td>Attention</td>
+                                <td>1.40 × 10<sup>-2</sup></td>
+                                <td>2.40 × 10<sup>-3</sup></td>
+                            </tr>
+                            <tr>
+                                <td><code>model.layers.12.mlp.down_proj.weight</code></td>
+                                <td>Feedforward</td>
+                                <td>1.27 × 10<sup>-2</sup></td>
+                                <td>1.62 × 10<sup>-3</sup></td>
+                            </tr>
+                            <tr>
+                                <td><code>model.layers.5.mlp.down_proj.weight</code></td>
+                                <td>Feedforward</td>
+                                <td>1.26 × 10<sup>-2</sup></td>
+                                <td>2.90 × 10<sup>-3</sup></td>
+                            </tr>
+                            <tr>
+                                <td><code>model.layers.9.mlp.down_proj.weight</code></td>
+                                <td>Feedforward</td>
+                                <td>1.23 × 10<sup>-2</sup></td>
+                                <td>1.47 × 10<sup>-3</sup></td>
+                            </tr>
+                            <tr>
+                                <td><code>model.layers.6.mlp.down_proj.weight</code></td>
+                                <td>Feedforward</td>
+                                <td>1.20 × 10<sup>-2</sup></td>
+                                <td>1.44 × 10<sup>-3</sup></td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-            <table class="data-table">
-                <caption style="caption-side: bottom; text-align: left; font-size: 0.85rem; padding-top: 6px;">Average drift by functional block</caption>
-                <thead>
-                    <tr>
-                        <th>Layer type</th>
-                        <th>Count</th>
-                        <th>Avg. relative L<sub>2</sub></th>
-                        <th>Avg. max |Δ|</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>Embedding</td>
-                        <td>1</td>
-                        <td>6.67 × 10<sup>-9</sup></td>
-                        <td>2.98 × 10<sup>-8</sup></td>
-                    </tr>
-                    <tr>
-                        <td>LayerNorm</td>
-                        <td>54</td>
-                        <td>≈ 0</td>
-                        <td>≈ 0</td>
-                    </tr>
-                    <tr>
-                        <td>Feedforward</td>
-                        <td>54</td>
-                        <td>9.49 × 10<sup>-3</sup></td>
-                        <td>2.38 × 10<sup>-3</sup></td>
-                    </tr>
-                    <tr>
-                        <td>Attention</td>
-                        <td>126</td>
-                        <td>5.16 × 10<sup>-3</sup></td>
-                        <td>1.13 × 10<sup>-3</sup></td>
-                    </tr>
-                    <tr>
-                        <td>Other</td>
-                        <td>1</td>
-                        <td>≈ 0</td>
-                        <td>≈ 0</td>
-                    </tr>
-                </tbody>
-            </table>
+                    <table class="data-table">
+                        <caption style="caption-side: bottom; text-align: left; font-size: 0.85rem; padding-top: 6px;">Average drift by functional block</caption>
+                        <thead>
+                            <tr>
+                                <th>Layer type</th>
+                                <th>Count</th>
+                                <th>Avg. relative L<sub>2</sub></th>
+                                <th>Avg. max |Δ|</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Embedding</td>
+                                <td>1</td>
+                                <td>6.67 × 10<sup>-9</sup></td>
+                                <td>2.98 × 10<sup>-8</sup></td>
+                            </tr>
+                            <tr>
+                                <td>LayerNorm</td>
+                                <td>54</td>
+                                <td>≈ 0</td>
+                                <td>≈ 0</td>
+                            </tr>
+                            <tr>
+                                <td>Feedforward</td>
+                                <td>54</td>
+                                <td>9.49 × 10<sup>-3</sup></td>
+                                <td>2.38 × 10<sup>-3</sup></td>
+                            </tr>
+                            <tr>
+                                <td>Attention</td>
+                                <td>126</td>
+                                <td>5.16 × 10<sup>-3</sup></td>
+                                <td>1.13 × 10<sup>-3</sup></td>
+                            </tr>
+                            <tr>
+                                <td>Other</td>
+                                <td>1</td>
+                                <td>≈ 0</td>
+                                <td>≈ 0</td>
+                            </tr>
+                        </tbody>
+                    </table>
 
-            <p>
-                Because the loader dequantizes int8 weights before comparison, these numbers reflect true reconstruction error rather than byte-level drift.
-                The tooling doubles as a regression guard—rerun it after any quantization tweak and you instantly see which tensors jumped.
-            </p>
+                    <p>
+                        Because the loader dequantizes int8 weights before comparison, these numbers reflect true reconstruction error rather than byte-level drift.
+                        The tooling doubles as a regression guard—rerun it after any quantization tweak and you instantly see which tensors jumped.
+                    </p>
+                </section>
 
-            <h2>Mini Translation Smoke Tests</h2>
-            <p>
-                Two quick prompts (English→French and English→Spanish) confirm the FP32 model still behaves. They’re intentionally simple; the goal is to
-                catch catastrophic issues like wrong tokenization or broken generation configs.
-            </p>
+                <section id="smoke-tests">
+                    <h2>Mini Translation Smoke Tests</h2>
+                    <p>
+                        Two quick prompts (English→French and English→Spanish) confirm the FP32 model still behaves. They’re intentionally simple; the goal is to
+                        catch catastrophic issues like wrong tokenization or broken generation configs.
+                    </p>
+                </section>
 
-            <h2>Takeaways & Next Steps</h2>
-            <ul>
-                <li>Local, multi-precision exports are repeatable—everything needed lives in one notebook.</li>
-                <li>Quantized checkpoints reconstruct cleanly; any downstream accuracy change will come from runtime kernels, not corrupted weights.</li>
-                <li>The drift explorer is reusable: point it at new safetensors pairs to spot anomalies before shipping.</li>
-                <li>CPU inference is educational only. For speed you either need CUDA support or a CPU-native quantized runtime.</li>
-                <li>Next experiments: wire the same tooling into a CUDA box to measure real-time speedups, then evaluate FP4 quality on longer prompts.</li>
-            </ul>
+                <section id="takeaways">
+                    <h2>Takeaways &amp; Next Steps</h2>
+                    <ul>
+                        <li>Local, multi-precision exports are repeatable—everything needed lives in one notebook.</li>
+                        <li>Quantized checkpoints reconstruct cleanly; any downstream accuracy change will come from runtime kernels, not corrupted weights.</li>
+                        <li>The drift explorer is reusable: point it at new safetensors pairs to spot anomalies before shipping.</li>
+                        <li>CPU inference is educational only. For speed you either need CUDA support or a CPU-native quantized runtime.</li>
+                        <li>Next experiments: wire the same tooling into a CUDA box to measure real-time speedups, then evaluate FP4 quality on longer prompts.</li>
+                    </ul>
 
-            <p>
-                Curious to dig deeper? Open <code>formatted_code.ipynb</code>. Every step—from model load to diff report—is annotated and ready to reuse.
-            </p>
+                    <p>
+                        Curious to dig deeper? Open <code>formatted_code.ipynb</code>. Every step—from model load to diff report—is annotated and ready to reuse.
+                    </p>
+                </section>
+            </main>
         </div>
     </div>
 </body>
