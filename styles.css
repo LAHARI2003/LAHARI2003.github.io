@@ -102,11 +102,15 @@ header {
     color: var(--text-color);
 }
 
-.nav-link:hover {
+.nav-link:hover, .nav-link.active {
     transform: translateY(-3px);
     box-shadow: var(--shadow-md);
     border-color: var(--accent-color);
     color: var(--accent-color);
+}
+
+.nav-link.active {
+    background-color: #e0f2f1; /* Very subtle teal tint for active state */
 }
 
 .nav-icon {
