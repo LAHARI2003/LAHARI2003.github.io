@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Edge AI Landscape: Constraints, Hardware, & Trends</title>
+    <meta name="description" content="A deep dive into the constraints shaping Edge AI, from TinyML to Heavy Edge, including quantization strategies and the latest research trends.">
+    <meta name="author" content="Kommalapati Lahari">
+    <meta name="robots" content="index,follow">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="content-box">
+            <header class="post-header">
+                <div class="post-header-top">
+                    <a class="nav-link nav-link-back" href="blog.html">← Back to Blog</a>
+                </div>
+                <p class="post-meta">
+                    Edge AI • TinyML • Quantization • Literature Review
+                </p>
+                <h1 class="page-title">The Edge AI Landscape: Constraints, Hardware, & Trends</h1>
+                <p class="post-subtitle">
+                    Defining the spectrum of Edge AI not by arbitrary labels, but by the primary constraint: Power. From milliwatt TinyML to 300W Edge Servers.
+                </p>
+            </header>
+
+            <aside class="post-toc">
+                <h2 class="toc-title">On this page</h2>
+                <ol>
+                    <li><a href="#hierarchy">The Edge AI Hierarchy</a></li>
+                    <li><a href="#quantization">Quantization Strategies</a></li>
+                    <li><a href="#trends-tinyml-mobile">Trends: TinyML & Mobile</a></li>
+                    <li><a href="#trends-industrial-heavy">Trends: Industrial & Heavy Edge</a></li>
+                </ol>
+            </aside>
+
+            <main class="post-body">
+                <section id="introduction">
+                    <p>
+                        Edge AI is often treated as a monolith, but deploying a model on a microcontroller is a fundamentally different engineering challenge than deploying on a ruggedized GPU server. The defining factor isn't the model architecture—it's the <strong>primary constraint</strong>.
+                    </p>
+                    <p>
+                        I've classified the Edge AI landscape into four distinct tiers based on power envelopes, which dictate the available hardware, possible models, and viable use cases.
+                    </p>
+                </section>
+
+                <section id="hierarchy">
+                    <h2>The Edge AI Hierarchy</h2>
+                    <figure>
+                        <img src="images/Untitled diagram-2025-11-24-172118.png" alt="Edge AI Project Classification Flowchart" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                        <figcaption style="text-align: center; font-style: italic; color: #666; font-size: 0.9rem;">Figure 1: Classification of Edge AI projects by Power Constraint (mW to 300W).</figcaption>
+                    </figure>
+
+                    <h3>1. TinyML / Ultra-Low (mW – 1W)</h3>
+                    <ul>
+                        <li><strong>Hardware:</strong> MCU / DSP (STM32, Arduino, Arm Ethos-U)</li>
+                        <li><strong>Models:</strong> Heavily Quantized, 1D-CNNs, MobileNet V1/V2 Int8, Random Forests</li>
+                        <li><strong>Use Cases:</strong> Keyword Spotting, Vibration/Anomaly Detection, Presence Detection</li>
+                        <li><strong>Constraint:</strong> Battery life (coin cell) and extreme memory limitations (KB to low MB).</li>
+                    </ul>
+
+                    <h3>2. Mobile / Consumer (1W – 10W)</h3>
+                    <ul>
+                        <li><strong>Hardware:</strong> SoC / NPU (Qualcomm Hexagon, Apple NE, RPi 5, Google Coral)</li>
+                        <li><strong>Models:</strong> YOLOv8-Nano, FaceNet, Whisper Tiny, Llama-3-8B 4-bit</li>
+                        <li><strong>Use Cases:</strong> Smart Home, Face ID, Local Chatbots, Basic Object Detection</li>
+                        <li><strong>Constraint:</strong> Thermal throttling in handheld devices and battery drain.</li>
+                    </ul>
+
+                    <h3>3. Industrial / Embedded (10W – 60W)</h3>
+                    <ul>
+                        <li><strong>Hardware:</strong> SoM / Discrete GPU (Jetson Orin NX, Hailo-8, Intel Arc)</li>
+                        <li><strong>Models:</strong> YOLOv8-Med/Large, ResNet, Mask R-CNN, ViT-Base</li>
+                        <li><strong>Use Cases:</strong> Defect Detection, Robotics / SLAM, Complex Segmentation</li>
+                        <li><strong>Constraint:</strong> Active cooling availability and industrial power supplies.</li>
+                    </ul>
+
+                    <h3>4. Heavy Edge / Micro-Server (60W – 300W)</h3>
+                    <ul>
+                        <li><strong>Hardware:</strong> Rugged Server / PCIe (NVIDIA IGX, Tesla FSD, Qualcomm Cloud AI)</li>
+                        <li><strong>Models:</strong> BEVFormer, 3D U-Net, Llama-3-70B, NeRFs</li>
+                        <li><strong>Use Cases:</strong> Autonomous Driving, Medical Imaging (CT/MRI), Local RAG / Large LLMs</li>
+                        <li><strong>Constraint:</strong> Form factor and rack power density, rather than individual chip power.</li>
+                    </ul>
+                </section>
+
+                <section id="quantization">
+                    <h2>Quantization Strategies</h2>
+                    <p>
+                        To fit these models into their respective tiers, quantization is non-negotiable. The technique chosen depends heavily on the hardware support (e.g., integer-only DSPs vs. tensor cores).
+                    </p>
+                    <figure>
+                        <img src="images/Untitled diagram-2025-11-24-173122.png" alt="Quantization Strategies Diagram" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                        <figcaption style="text-align: center; font-style: italic; color: #666; font-size: 0.9rem;">Figure 2: Evolution of quantization techniques from Full Integer to FP8.</figcaption>
+                    </figure>
+
+                    <ul>
+                        <li><strong>Full Integer Quantization (Int8 / Int4):</strong> Critical for TinyML (no FPUs). Requires static calibration with a representative dataset.</li>
+                        <li><strong>Dynamic Range & W4A16:</strong> Popular for mobile vision and LLMs. Weights are Int8/Int4, but activations remain dynamic, solving memory bandwidth issues while keeping precision.</li>
+                        <li><strong>Static Int8 (TensorRT):</strong> The industrial standard. Minimizes KL Divergence via calibration. Often combined with pruning.</li>
+                        <li><strong>FP8, BF16 & Advanced Activation:</strong> For Heavy Edge. Prioritizes range over extreme compression. Techniques like SmoothQuant allow Int8 inference on massive outliers.</li>
+                    </ul>
+                </section>
+
+                <section id="trends-tinyml-mobile">
+                    <h2>Trends: TinyML & Mobile</h2>
+                    <p>
+                        The push is towards on-device training and overcoming RAM limitations for LLMs.
+                    </p>
+                    <figure>
+                        <img src="images/image (1).png" alt="Research Papers: TinyML and Mobile" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                        <figcaption style="text-align: center; font-style: italic; color: #666; font-size: 0.9rem;">Figure 3: Recent Innovations in Ultra-Low Power and Consumer Edge.</figcaption>
+                    </figure>
+                    
+                    <div class="paper-highlight">
+                        <strong>Key Papers:</strong>
+                        <ul>
+                            <li><em>PockEngine:</em> Sparse fine-tuning on the edge (Cortex-M).</li>
+                            <li><em>MCUNetV3:</em> On-device training on <1MB RAM.</li>
+                            <li><em>LLM in a flash:</em> Loading parameters from Flash storage to DRAM on demand.</li>
+                            <li><em>MobileLLM:</em> "Depth > Width" architecture design for sub-billion parameter models.</li>
+                        </ul>
+                    </div>
+                </section>
+
+                <section id="trends-industrial-heavy">
+                    <h2>Trends: Industrial & Heavy Edge</h2>
+                    <p>
+                        Innovations here focus on removing bottlenecks (like NMS) and handling infinite streams/contexts.
+                    </p>
+                    <figure>
+                        <img src="images/image.png" alt="Research Papers: Industrial and Heavy Edge" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                        <figcaption style="text-align: center; font-style: italic; color: #666; font-size: 0.9rem;">Figure 4: Innovations in Industrial and Server-Class Edge AI.</figcaption>
+                    </figure>
+
+                    <div class="paper-highlight">
+                        <strong>Key Papers:</strong>
+                        <ul>
+                            <li><em>YOLOv10:</em> Removes NMS post-processing for lower latency.</li>
+                            <li><em>StreamDiffusion:</em> Real-time interactive generation pipeline.</li>
+                            <li><em>StreamingLLM:</em> Infinite context management via "Attention Sinks".</li>
+                            <li><em>AWQ:</em> Activation-aware Weight Quantization for Llama-3-70B class models.</li>
+                        </ul>
+                    </div>
+                </section>
+
+            </main>
+        </div>
+    </div>
+</body>
+</html>
+
