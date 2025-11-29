@@ -8,6 +8,73 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <style>
+        /* Inline styles to ensure popup renders correctly even if cached CSS fails */
+        #password-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #fdfbf7; /* Warm off-white/cream matching theme */
+            z-index: 9999;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .password-box {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            border: 1px solid #e0e0e0;
+            max-width: 400px;
+            width: 90%;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .password-input {
+            width: 100%;
+            padding: 12px;
+            margin: 16px 0;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.3s;
+            box-sizing: border-box;
+        }
+
+        .password-input:focus {
+            border-color: #006d77;
+        }
+
+        .password-submit {
+            background: #006d77;
+            color: white;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            width: 100%;
+        }
+
+        .password-submit:hover {
+            background: #004d55;
+        }
+
+        .password-error {
+            color: #e53935;
+            margin-top: 12px;
+            font-size: 0.9rem;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <div id="password-overlay">
