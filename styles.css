@@ -380,3 +380,66 @@ pre {
     margin: 16px 0;
     border: 1px solid #e0e0e0;
 }
+
+/* Password Overlay */
+#password-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: var(--bg-color);
+    z-index: 9999;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.password-box {
+    background: var(--card-bg);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: var(--shadow-lg);
+    text-align: center;
+    border: 1px solid var(--border-color);
+    max-width: 400px;
+    width: 90%;
+}
+
+.password-input {
+    width: 100%;
+    padding: 12px;
+    margin: 16px 0;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.3s;
+}
+
+.password-input:focus {
+    border-color: var(--accent-color);
+}
+
+.password-submit {
+    background: var(--accent-color);
+    color: white;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.password-submit:hover {
+    background: var(--accent-hover);
+}
+
+.password-error {
+    color: #e53935;
+    margin-top: 12px;
+    font-size: 0.9rem;
+    display: none;
+}

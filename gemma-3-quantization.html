@@ -21,7 +21,7 @@
                 </p>
                 <h1 class="page-title">Rebuilding Gemma&nbsp;3&nbsp;270M Locally: Quantization, Introspection, Drift</h1>
                 <p class="post-subtitle">
-                    A from-scratch, fully transparent export pipeline for Gemma&nbsp;3&nbsp;270M—FP32, int8, and FP4—plus tools to prove the
+                    A from scratch, fully transparent export pipeline for Gemma&nbsp;3&nbsp;270M FP32, int8, and FP4 plus tools to prove the
                     quantized checkpoints really reconstruct what you think they do.
                 </p>
             </header>
@@ -45,8 +45,8 @@
                 <section id="introduction">
                     <p>
                         I tore down and rewrote the Gemma&nbsp;3 270M quantization notebook (<code>formatted_code.ipynb</code>) so I could own the full
-                        export pipeline—no hidden helper scripts, no unexplained tensors. This post is a clean retelling of that build, from grabbing the
-                        instruction-tuned weights to proving the quantized checkpoints reconstruct exactly what I expect.
+                        export pipeline no hidden helper scripts, no unexplained tensors. This post is a clean retelling of that build, from grabbing the
+                        instruction tuned weights to proving the quantized checkpoints reconstruct exactly what I expect.
                     </p>
                     <p>
                         Think of it as a reproducible recipe: start from the official model card, end with locally saved FP32, int8, and FP4 checkpoints,
@@ -57,10 +57,10 @@
                 <section id="notebook-scope">
                     <h2>What the New Notebook Covers</h2>
                     <ul>
-                        <li><strong>Three-way export:</strong> raw FP32, <code>bitsandbytes</code> int8, and FP4 checkpoints saved locally with matching tokenizer.</li>
+                        <li><strong>Three way export:</strong> raw FP32, <code>bitsandbytes</code> int8, and FP4 checkpoints saved locally with matching tokenizer.</li>
                         <li><strong>Tensor spelunking:</strong> full inventory of every <code>.safetensors</code> key for each precision level.</li>
                         <li><strong>Edge sanity checks:</strong> manual dequantization of int8 matrices and tiny translation prompts to make sure generation still works.</li>
-                        <li><strong>State-diff tooling:</strong> a reusable module that quantifies how much each tensor moves after quantization.</li>
+                        <li><strong>State diff tooling:</strong> a reusable module that quantifies how much each tensor moves after quantization.</li>
                     </ul>
                 </section>
 
@@ -365,7 +365,7 @@ model_int4 = Gemma3ForCausalLM.from_pretrained(model_id, quantization_config=bnb
                     </ul>
 
                     <p>
-                        Curious to dig deeper? Open <code>formatted_code.ipynb</code>. Every step—from model load to diff report—is annotated and ready to reuse.
+                        Curious to dig deeper? Open <code>formatted_code.ipynb</code>. Every step from model load to diff report is annotated and ready to reuse.
                     </p>
                 </section>
             </main>

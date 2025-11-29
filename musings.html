@@ -10,7 +10,17 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
+    <div id="password-overlay">
+        <div class="password-box">
+            <h2 style="margin-bottom: 16px; font-size: 1.5rem;">Protected Content</h2>
+            <p style="color: var(--secondary-text); margin-bottom: 20px;">Please enter the password to view these musings.</p>
+            <input type="password" id="password-input" class="password-input" placeholder="Enter password">
+            <button id="password-submit" class="password-submit">Access</button>
+            <p id="password-error" class="password-error">Incorrect password. Please try again.</p>
+        </div>
+    </div>
+
+    <div class="container" id="main-content" style="display: none;">
         <header>
             <h1 class="name">!Technical Blog</h1>
             <div class="nav-links">
@@ -22,8 +32,9 @@
 
         <section id="musings" class="about-section" style="text-align: left;">
             <h2>Musings</h2>
-            <p style="margin-bottom: 24px; color: #555; font-style: italic;">
-                Where I relate AI/ML concepts to real-life analogies.
+            <p style="font-style: italic; color: #555; font-size: 0.95rem; margin-bottom: 24px; padding: 16px; border-left: 3px solid var(--accent-color); background: rgba(0,0,0,0.02);">
+                <strong>Disclaimer:</strong> I always find it fun to relate the concepts learning in the AI/ML Domain into analogies which we can use in real life. 
+                You might find some of these "musings" in my blog. All these are my perspective :)
             </p>
             <ul class="blog-list">
                 <li>
@@ -35,6 +46,47 @@
             </ul>
         </section>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const overlay = document.getElementById('password-overlay');
+            const mainContent = document.getElementById('main-content');
+            const input = document.getElementById('password-input');
+            const submitBtn = document.getElementById('password-submit');
+            const errorMsg = document.getElementById('password-error');
+            
+            // Simple client-side password check
+            // Note: This is not secure for sensitive data, but works for simple gating.
+            const CORRECT_PASSWORD = "admin"; 
+
+            function checkPassword() {
+                if (input.value === CORRECT_PASSWORD) {
+                    overlay.style.opacity = '0';
+                    setTimeout(() => {
+                        overlay.style.display = 'none';
+                        mainContent.style.display = 'block';
+                        // Trigger animations
+                        mainContent.style.animation = 'fadeInUp 0.8s ease-out forwards';
+                    }, 300);
+                } else {
+                    errorMsg.style.display = 'block';
+                    input.value = '';
+                    input.focus();
+                }
+            }
+
+            submitBtn.addEventListener('click', checkPassword);
+
+            input.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    checkPassword();
+                }
+            });
+            
+            // Auto focus input
+            input.focus();
+        });
+    </script>
 </body>
 </html>
 
