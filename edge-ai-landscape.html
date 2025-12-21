@@ -46,7 +46,7 @@
                 <section id="hierarchy">
                     <h2>The Edge AI Hierarchy</h2>
                     <figure>
-                        <img src="images/Untitled diagram-2025-11-24-172118.png" alt="Edge AI Project Classification Flowchart" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                        <img class="zoomable-image" src="images/Untitled diagram-2025-11-24-172118.png" alt="Edge AI Project Classification Flowchart" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
                         <figcaption style="text-align: center; font-style: italic; color: #666; font-size: 0.9rem;">Figure 1: Classification of Edge AI projects by Power Constraint (mW to 300W).</figcaption>
                     </figure>
                 </section>
@@ -57,7 +57,7 @@
                         To fit these models into their respective tiers, quantization is non-negotiable. The technique chosen depends heavily on the hardware support (e.g., integer-only DSPs vs. tensor cores).
                     </p>
                     <figure>
-                        <img src="images/Untitled diagram-2025-11-24-173122.png" alt="Quantization Strategies Diagram" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
+                        <img class="zoomable-image" src="images/Untitled diagram-2025-11-24-173122.png" alt="Quantization Strategies Diagram" style="width: 100%; border-radius: 8px; margin-bottom: 10px;">
                         <figcaption style="text-align: center; font-style: italic; color: #666; font-size: 0.9rem;">Figure 2: Evolution of quantization techniques from Full Integer to FP8.</figcaption>
                     </figure>
 
@@ -68,6 +68,203 @@
             </main>
         </div>
     </div>
+
+    <!-- Image Lightbox (click any .zoomable-image) -->
+    <div id="image-lightbox" class="image-lightbox" aria-hidden="true">
+        <div class="image-lightbox__backdrop" data-close="true"></div>
+        <div class="image-lightbox__dialog" role="dialog" aria-modal="true" aria-label="Image viewer">
+            <div class="image-lightbox__toolbar">
+                <button type="button" class="image-lightbox__btn" data-action="zoom-out" aria-label="Zoom out">−</button>
+                <span class="image-lightbox__zoom" id="image-lightbox-zoom" aria-live="polite">100%</span>
+                <button type="button" class="image-lightbox__btn" data-action="zoom-in" aria-label="Zoom in">+</button>
+                <button type="button" class="image-lightbox__btn image-lightbox__btn--ghost" data-action="reset" aria-label="Reset zoom">Reset</button>
+                <div class="image-lightbox__spacer"></div>
+                <button type="button" class="image-lightbox__btn image-lightbox__btn--ghost" data-action="close" aria-label="Close viewer">✕</button>
+            </div>
+            <div class="image-lightbox__stage" id="image-lightbox-stage">
+                <img id="image-lightbox-img" alt="">
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function () {
+            const lightbox = document.getElementById('image-lightbox');
+            const stage = document.getElementById('image-lightbox-stage');
+            const zoomLabel = document.getElementById('image-lightbox-zoom');
+            const viewerImg = document.getElementById('image-lightbox-img');
+
+            let isOpen = false;
+            let scale = 1;
+            let tx = 0;
+            let ty = 0;
+            let baseW = 0;
+            let baseH = 0;
+            let dragActive = false;
+            let dragStartX = 0;
+            let dragStartY = 0;
+            let dragStartTx = 0;
+            let dragStartTy = 0;
+
+            const clamp = (v, min, max) => Math.min(max, Math.max(min, v));
+
+            function measureBase() {
+                // Measure the image at "fit" size (scale=1, translate=0)
+                viewerImg.style.transform = 'translate(0px, 0px) scale(1)';
+                const r = viewerImg.getBoundingClientRect();
+                baseW = r.width;
+                baseH = r.height;
+            }
+
+            function clampTranslate() {
+                const stageRect = stage.getBoundingClientRect();
+                const stageW = stageRect.width;
+                const stageH = stageRect.height;
+                const maxTx = Math.max(0, (baseW * scale - stageW) / 2);
+                const maxTy = Math.max(0, (baseH * scale - stageH) / 2);
+                tx = clamp(tx, -maxTx, maxTx);
+                ty = clamp(ty, -maxTy, maxTy);
+            }
+
+            function applyTransform() {
+                clampTranslate();
+                viewerImg.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+                zoomLabel.textContent = `${Math.round(scale * 100)}%`;
+                stage.classList.toggle('is-grabbable', scale > 1.01);
+            }
+
+            function setScale(nextScale) {
+                const min = 1;
+                const max = 6;
+                scale = clamp(nextScale, min, max);
+                if (scale <= 1.01) {
+                    tx = 0;
+                    ty = 0;
+                }
+                applyTransform();
+            }
+
+            function openLightbox(src, alt) {
+                isOpen = true;
+                scale = 1;
+                tx = 0;
+                ty = 0;
+
+                viewerImg.src = src;
+                viewerImg.alt = alt || '';
+
+                lightbox.classList.add('is-open');
+                lightbox.setAttribute('aria-hidden', 'false');
+                document.body.style.overflow = 'hidden';
+
+                // Wait for paint + image load to measure correctly.
+                requestAnimationFrame(() => {
+                    if (viewerImg.complete) {
+                        measureBase();
+                        applyTransform();
+                    }
+                });
+            }
+
+            function closeLightbox() {
+                isOpen = false;
+                dragActive = false;
+                lightbox.classList.remove('is-open');
+                lightbox.setAttribute('aria-hidden', 'true');
+                document.body.style.overflow = '';
+                viewerImg.src = '';
+                viewerImg.alt = '';
+                scale = 1;
+                tx = 0;
+                ty = 0;
+                zoomLabel.textContent = '100%';
+                stage.classList.remove('is-grabbable');
+            }
+
+            function handleAction(action) {
+                if (!isOpen && action !== 'close') return;
+                if (action === 'zoom-in') setScale(scale + 0.2);
+                if (action === 'zoom-out') setScale(scale - 0.2);
+                if (action === 'reset') setScale(1);
+                if (action === 'close') closeLightbox();
+            }
+
+            // Wire up zoomable images
+            document.querySelectorAll('img.zoomable-image').forEach((img) => {
+                img.tabIndex = 0;
+                img.setAttribute('role', 'button');
+                img.setAttribute('aria-label', `Open image: ${img.alt || 'diagram'}`);
+                img.addEventListener('click', () => openLightbox(img.src, img.alt));
+                img.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        openLightbox(img.src, img.alt);
+                    }
+                });
+            });
+
+            // Toolbar buttons + backdrop click
+            lightbox.addEventListener('click', (e) => {
+                const t = e.target;
+                if (!(t instanceof Element)) return;
+                if (t.matches('[data-close="true"]')) closeLightbox();
+                const btn = t.closest('[data-action]');
+                if (btn) handleAction(btn.getAttribute('data-action'));
+            });
+
+            // Keyboard shortcuts
+            document.addEventListener('keydown', (e) => {
+                if (!isOpen) return;
+                if (e.key === 'Escape') closeLightbox();
+                if (e.key === '+' || e.key === '=') handleAction('zoom-in');
+                if (e.key === '-' || e.key === '_') handleAction('zoom-out');
+                if (e.key.toLowerCase() === '0') handleAction('reset');
+            });
+
+            // Wheel to zoom
+            stage.addEventListener('wheel', (e) => {
+                if (!isOpen) return;
+                e.preventDefault();
+                const direction = e.deltaY > 0 ? -1 : 1;
+                setScale(scale + direction * 0.15);
+            }, { passive: false });
+
+            // Drag to pan (when zoomed)
+            stage.addEventListener('pointerdown', (e) => {
+                if (!isOpen || scale <= 1.01) return;
+                dragActive = true;
+                dragStartX = e.clientX;
+                dragStartY = e.clientY;
+                dragStartTx = tx;
+                dragStartTy = ty;
+                stage.setPointerCapture(e.pointerId);
+            });
+
+            stage.addEventListener('pointermove', (e) => {
+                if (!dragActive) return;
+                const dx = e.clientX - dragStartX;
+                const dy = e.clientY - dragStartY;
+                tx = dragStartTx + dx;
+                ty = dragStartTy + dy;
+                applyTransform();
+            });
+
+            stage.addEventListener('pointerup', () => { dragActive = false; });
+            stage.addEventListener('pointercancel', () => { dragActive = false; });
+
+            // Re-measure on image load and window resize
+            viewerImg.addEventListener('load', () => {
+                if (!isOpen) return;
+                measureBase();
+                applyTransform();
+            });
+            window.addEventListener('resize', () => {
+                if (!isOpen) return;
+                measureBase();
+                applyTransform();
+            });
+        })();
+    </script>
 </body>
 </html>
 
