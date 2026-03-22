@@ -69,14 +69,15 @@ header {
 
 /* Profile Photo */
 .profile-photo {
-    width: 160px;
-    height: 160px;
+    width: 220px;
+    height: 220px;
     border-radius: 50%;
     object-fit: cover;
-    object-position: center 15%;
+    object-position: center 60%;
     border: 3px solid var(--accent-color);
     box-shadow: var(--shadow-md);
     flex-shrink: 0;
+    image-rendering: high-quality;
 }
 
 .profile-text {
