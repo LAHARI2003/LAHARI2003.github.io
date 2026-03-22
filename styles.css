@@ -55,9 +55,16 @@ a {
 
 /* Header / Profile Section */
 header {
-    text-align: center;
     margin-bottom: 60px;
     animation: fadeInDown 0.8s ease-out;
+}
+
+/* Photo + Name side by side */
+.profile-info {
+    display: flex;
+    align-items: center;
+    gap: 36px;
+    margin-bottom: 36px;
 }
 
 /* Profile Photo */
@@ -69,7 +76,11 @@ header {
     object-position: center 15%;
     border: 3px solid var(--accent-color);
     box-shadow: var(--shadow-md);
-    margin-bottom: 20px;
+    flex-shrink: 0;
+}
+
+.profile-text {
+    text-align: left;
 }
 
 .name, .page-title {
@@ -530,6 +541,16 @@ header {
     .nav-links { flex-direction: column; width: 100%; }
     .nav-link { width: 100%; justify-content: center; }
     .data-table { display: block; overflow-x: auto; }
+
+    /* Stack photo above name on mobile */
+    .profile-info {
+        flex-direction: column;
+        text-align: center;
+        gap: 20px;
+    }
+    .profile-text {
+        text-align: center;
+    }
 }
 
 /* Code blocks */
