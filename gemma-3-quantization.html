@@ -5,8 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rebuilding Gemma&nbsp;3&nbsp;270M Locally</title>
     <meta name="description" content="From-scratch, fully transparent export and quantization pipeline for Gemma 3 270M: FP32, int8, and FP4 checkpoints, drift analysis, and CPU inference notes.">
-    <meta name="author" content="Portfolio Experiments">
+    <meta name="author" content="Kommalapati Lahari">
     <meta name="robots" content="index,follow">
+    <meta property="og:title" content="Quantizing Gemma 3 270M: Safetensors, Memory, and CPU Trials">
+    <meta property="og:description" content="From-scratch export and quantization pipeline for Gemma 3 270M — FP32, int8, and FP4 checkpoints, drift analysis, and CPU inference benchmarks.">
+    <meta property="og:type" content="article">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
@@ -19,6 +22,8 @@
                 <p class="post-meta">
                     Gemma&nbsp;3 • 270M • Quantization &amp; drift analysis • CPU-only Windows build
                 </p>
+                <p class="date">Published: December 2025</p>
+                <span class="reading-time">~15 min read</span>
                 <h1 class="page-title">Rebuilding Gemma&nbsp;3&nbsp;270M Locally: Quantization, Introspection, Drift</h1>
                 <p class="post-subtitle">
                     A from scratch, fully transparent export pipeline for Gemma&nbsp;3&nbsp;270M FP32, int8, and FP4 plus tools to prove the
@@ -369,6 +374,17 @@ model_int4 = Gemma3ForCausalLM.from_pretrained(model_id, quantization_config=bnb
                     </p>
                 </section>
             </main>
+
+            <nav class="post-nav">
+                <a href="edge-ai-landscape.html">
+                    <span class="post-nav-label">← Previous</span>
+                    <span class="post-nav-title">The Edge AI Landscape</span>
+                </a>
+                <a href="mxfp4-nvfp4.html" class="post-nav-next">
+                    <span class="post-nav-label">Next →</span>
+                    <span class="post-nav-title">MXFP4 & NVFP4 Formats</span>
+                </a>
+            </nav>
         </div>
     </div>
 </body>

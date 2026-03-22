@@ -60,6 +60,18 @@ header {
     animation: fadeInDown 0.8s ease-out;
 }
 
+/* Profile Photo */
+.profile-photo {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    object-fit: cover;
+    object-position: center top;
+    border: 3px solid var(--accent-color);
+    box-shadow: var(--shadow-md);
+    margin-bottom: 20px;
+}
+
 .name, .page-title {
     font-family: 'Playfair Display', serif;
     font-size: 3rem;
@@ -320,6 +332,159 @@ header {
     background-color: #fbfbfb;
 }
 
+/* Post Date & Reading Time */
+.date {
+    font-size: 0.88rem;
+    color: var(--secondary-text);
+    margin-bottom: 8px;
+}
+
+.reading-time {
+    display: inline-block;
+    font-size: 0.82rem;
+    color: var(--secondary-text);
+    background: #f0f0f0;
+    padding: 2px 10px;
+    border-radius: 50px;
+    margin-bottom: 16px;
+}
+
+/* Blog list meta (date + reading time on hub pages) */
+.blog-list-meta {
+    display: block;
+    font-size: 0.82rem;
+    color: var(--secondary-text);
+    margin-top: 4px;
+    font-weight: 400;
+}
+
+/* Post Navigation (prev/next) */
+.post-nav {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    margin-top: 60px;
+    padding-top: 32px;
+    border-top: 1px solid var(--border-color);
+    flex-wrap: wrap;
+}
+
+.post-nav a {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 16px 20px;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    max-width: 48%;
+    transition: var(--transition);
+}
+
+.post-nav a:hover {
+    border-color: var(--accent-color);
+    box-shadow: var(--shadow-sm);
+    color: var(--accent-color);
+}
+
+.post-nav-label {
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--secondary-text);
+}
+
+.post-nav-title {
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.post-nav .post-nav-next {
+    margin-left: auto;
+    text-align: right;
+}
+
+/* Q&A Styles (used in mxfp4-nvfp4.html) */
+.qa-toc {
+    margin: 36px 0 60px 0;
+    padding: 28px 32px 28px 24px;
+    background: #f9f5ee;
+    border-left: 7px solid #d5b77f;
+    border-radius: 10px;
+}
+
+.qa-toc-title {
+    font-size: 1.17em;
+    font-weight: 600;
+    margin-bottom: 18px;
+}
+
+.qa-toc ul {
+    font-size: 1.12em;
+    margin-bottom: 0;
+    margin-top: 10px;
+}
+
+.qa-toc li {
+    margin-bottom: 10px;
+}
+
+.question {
+    display: block;
+    background: #faf7ff;
+    font-weight: bold;
+    font-size: 1.27em;
+    padding: 22px 32px 18px 20px;
+    border-radius: 8px;
+    margin: 52px 0 28px 0;
+    line-height: 1.43;
+}
+
+.answer-block {
+    margin-bottom: 62px;
+    line-height: 1.83;
+    font-size: 1.13em;
+    padding-left: 6px;
+}
+
+.answer-block p,
+.answer-block ul,
+.answer-block ol {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.answer-block ul,
+.answer-block ol {
+    padding-left: 36px;
+    margin-bottom: 24px;
+}
+
+.mini-topic {
+    display: block;
+    font-weight: bold;
+    margin-top: 32px;
+    margin-bottom: 6px;
+    font-size: 1.08em;
+}
+
+.img-caption {
+    font-size: 1.05em;
+    margin-top: 9px;
+    margin-bottom: 36px;
+    color: #444;
+}
+
+.md-section {
+    margin-top: 54px;
+    margin-bottom: 48px;
+}
+
+.ref-section {
+    margin-top: 70px;
+    margin-bottom: 50px;
+}
+
 /* Blog List Styles */
 .blog-list {
     list-style: none;
@@ -442,4 +607,41 @@ pre {
     margin-top: 12px;
     font-size: 0.9rem;
     display: none;
+}
+
+/* Dark Mode */
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #1a1a1a;
+        --text-color: #e8e4dd;
+        --accent-color: #4db6ac;
+        --accent-hover: #80cbc4;
+        --secondary-text: #aaa;
+        --border-color: #333;
+        --card-bg: #242424;
+        --shadow-sm: 0 2px 4px rgba(0,0,0,0.3);
+        --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+        --shadow-lg: 0 8px 24px rgba(0,0,0,0.5);
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+        color: #f0ece4;
+    }
+
+    .about-section p { color: #ccc; }
+    .data-table thead { background-color: #2e2e2e; }
+    .data-table tbody tr:hover { background-color: #2a2a2a; }
+    pre, code { background: #2e2e2e; border-color: #444; }
+    .post-toc { background: #222; }
+    .post-toc a { color: #bbb; }
+    .reading-time { background: #2e2e2e; }
+    .qa-toc { background: #232017; border-color: #a08850; }
+    .question { background: #1e1a2e; }
+    .img-caption { color: #aaa; }
+
+    @media (max-width: 700px) {
+        .qa-toc { padding: 14px 6px 14px 8px; }
+        .question { font-size: 1.10em; padding: 12px 6px 12px 8px; }
+        .answer-block { font-size: 1em; padding-left: 3px; }
+    }
 }

@@ -4,66 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MXFP4 & NVFP4: In-Depth Technical FAQ</title>
+    <meta name="description" content="A deep-dive FAQ on MXFP4 and NVFP4: block-wise 4-bit floating point formats for efficient LLM inference on Hopper and Blackwell GPUs.">
+    <meta name="author" content="Kommalapati Lahari">
+    <meta name="robots" content="index,follow">
+    <meta property="og:title" content="MXFP4 & NVFP4: Microscaled 4-bit Floating Point Formats">
+    <meta property="og:description" content="A deep-dive FAQ on MXFP4 and NVFP4: block-wise 4-bit floating point for efficient LLM inference on Hopper and Blackwell GPUs.">
+    <meta property="og:type" content="article">
     <link rel="stylesheet" href="styles.css">
-    <style>
-        html { scroll-behavior: smooth; }
-        .container { margin-bottom: 46px; }
-        .page-title { margin-bottom: 44px !important; }
-        .md-section, .ref-section { margin-top: 54px !important; margin-bottom: 48px !important; }
-        .question {
-            display: block;
-            background: #faf7ff;
-            font-weight: bold;
-            font-size: 1.27em;
-            padding: 22px 32px 18px 20px;
-            border-radius: 8px;
-            margin: 52px 0 28px 0;
-            line-height: 1.43;
-        }
-        .answer-block {
-            margin-bottom: 62px;
-            line-height: 1.83;
-            font-size: 1.13em;
-            padding-left: 6px;
-        }
-        .answer-block p, .answer-block ul, .answer-block ol {
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-        .answer-block ul, .answer-block ol {
-            padding-left: 36px;
-            margin-bottom: 24px;
-        }
-        .mini-topic {
-            display:block;
-            font-weight: bold;
-            margin-top: 32px;
-            margin-bottom: 6px;
-            font-size: 1.08em;
-        }
-        .ref-section { margin-top: 70px !important; margin-bottom: 50px !important; }
-        .qa-toc {
-            margin: 36px 0 60px 0;
-            padding: 28px 32px 28px 24px;
-            background: #f9f5ee;
-            border-left: 7px solid #d5b77f;
-            border-radius: 10px;
-        }
-        .qa-toc-title { font-size: 1.17em; font-weight: 600; margin-bottom: 18px; }
-        .qa-toc ul { font-size:1.12em; margin-bottom:0; margin-top:10px; }
-        .qa-toc li { margin-bottom: 10px; }
-        .img-caption {
-            font-size: 1.05em;
-            margin-top: 9px;
-            margin-bottom: 36px;
-            color: #444;
-        }
-        @media (max-width: 700px) {
-            .qa-toc { padding:14px 6px 14px 8px; }
-            .question { font-size:1.10em;padding:12px 6px 12px 8px;}
-            .answer-block { font-size:1em;padding-left:3px; }
-        }
-    </style>
 </head>
 <body>
 <div class="container">
@@ -71,6 +18,7 @@
     <h1 class="page-title">MXFP4 & NVFP4: Microscaled 4-bit Floating Point Formats</h1>
     <div style="margin-bottom:32px"><a class="nav-link" href="blog.html">← Back to Blog</a></div>
     <p class="date">Published: October 2025</p>
+    <span class="reading-time">~8 min read</span>
 
     <div class="qa-toc">
       <div class="qa-toc-title">In this article I answer the following questions (click to jump):</div>
@@ -180,6 +128,17 @@
         <li><a href="https://github.com/IST-DASLab/FP-Quant" target="_blank" rel="noopener noreferrer">GitHub: IST-DASLab/FP-Quant</a></li>
       </ul>
     </div>
+
+    <nav class="post-nav">
+      <a href="gemma-3-quantization.html">
+        <span class="post-nav-label">← Previous</span>
+        <span class="post-nav-title">Quantizing Gemma 3 270M</span>
+      </a>
+      <a href="gpt-oss-20b-profiling.html" class="post-nav-next">
+        <span class="post-nav-label">Next →</span>
+        <span class="post-nav-title">GPT-OSS-20B Profiling</span>
+      </a>
+    </nav>
   </div>
 </div>
 </body>

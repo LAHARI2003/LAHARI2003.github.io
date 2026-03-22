@@ -4,6 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GPT-OSS-20B on H100 — Profiling (Graphical)</title>
+    <meta name="description" content="Visual profiling summary of openai/gpt-oss-20b on an H100 instance using Nsight Systems: CUDA API time, GPU memory ops, and top kernel analysis.">
+    <meta name="author" content="Kommalapati Lahari">
+    <meta name="robots" content="index,follow">
+    <meta property="og:title" content="GPT-OSS-20B on H100 — Profiling (Graphical)">
+    <meta property="og:description" content="Visual profiling summary of GPT-OSS-20B on H100: CUDA API time distribution, GPU memory ops, and top kernel breakdown via Nsight Systems.">
+    <meta property="og:type" content="article">
     <link rel="stylesheet" href="styles.css">
     <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
     <script>mermaid.initialize({ startOnLoad: true });</script>
@@ -12,9 +18,11 @@
     <div class="container">
         <div class="content-box">
             <h1 class="page-title">GPT-OSS-20B on H100 — Profiling (Graphical)</h1>
-            <div style="margin-bottom:24px"><a class="nav-link" href="blog.html">← Back to Blog</a></div>
+            <div style="margin-bottom:16px"><a class="nav-link" href="blog.html">← Back to Blog</a></div>
+            <p class="date">Published: November 2025</p>
+            <span class="reading-time">~3 min read</span>
 
-            <p>This page gives a visual summary of an Nsight Systems profile for running <code>openai/gpt-oss-20b</code> with <code>transformers</code> on an H100 instance.</p>
+            <p style="margin-top:24px;">This page gives a visual summary of an Nsight Systems profile for running <code>openai/gpt-oss-20b</code> with <code>transformers</code> on an H100 instance.</p>
 
             <h3>Source files referenced</h3>
             <ul>
@@ -68,7 +76,13 @@ pie title Top GPU Kernels Time (%)
             </div>
             <p><em>Interpretation:</em> Time is concentrated in GEMM-like kernels (attention/MLP). Elementwise ops and reductions are smaller contributors.</p>
 
-            
+
+            <nav class="post-nav">
+                <a href="mxfp4-nvfp4.html">
+                    <span class="post-nav-label">← Previous</span>
+                    <span class="post-nav-title">MXFP4 & NVFP4 Formats</span>
+                </a>
+            </nav>
         </div>
     </div>
 </body>
