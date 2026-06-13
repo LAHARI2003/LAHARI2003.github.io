@@ -10,162 +10,159 @@
     <meta property="og:title" content="Kommalapati Lahari — AI Acceleration Researcher">
     <meta property="og:description" content="CS graduate from IIT Patna researching Edge Language Models, quantization, pruning, and memory-efficient inference.">
     <meta property="og:type" content="website">
-    <link rel="stylesheet" href="styles.css?v=2">
+    <link rel="stylesheet" href="styles.css?v=3">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <header>
-            <div class="profile-info">
-                <img src="images/Kommalapati_Lahari_photo.JPG" alt="Kommalapati Lahari" class="profile-photo">
-                <div class="profile-text">
-                    <h1 class="name">Kommalapati Lahari</h1>
-                    <p class="tagline">Computer Science Graduate | AI Acceleration Enthusiast</p>
-                </div>
+<div class="page-sidebar">
+
+    <aside class="sidebar">
+        <img src="images/lahari_photo.jpg" alt="Kommalapati Lahari" class="sidebar-photo">
+        <h1 class="sidebar-name">Kommalapati Lahari</h1>
+        <p class="sidebar-tagline">CS Graduate · AI Acceleration Enthusiast</p>
+
+        <hr class="sidebar-divider">
+
+        <nav class="sidebar-nav">
+            <a href="mailto:lahari1803ks@gmail.com" class="sidebar-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <path d="m2 7 10 7 10-7"></path>
+                </svg>
+                Email
+            </a>
+            <a href="#projects" class="sidebar-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
+                </svg>
+                Projects
+            </a>
+            <a href="blog.html" class="sidebar-link">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                </svg>
+                Blog
+            </a>
+            <a href="https://github.com/LAHARI2003" class="sidebar-link" target="_blank" rel="noopener noreferrer">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
+                </svg>
+                GitHub
+            </a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+
+        <section class="section">
+            <div class="section-label">About</div>
+            <div class="about-content">
+                <p>I'm <strong>Kommalapati Lahari</strong>, an IIT Patna Computer Science graduate.</p>
+
+                <p>
+                    My research focuses on developing efficient and sustainable AI accelerators by jointly optimizing algorithms
+                    and architectures. I see a paradigm shift from large-scale LLMs toward <strong>Edge Language Models (ELMs)</strong>
+                    optimized for batch size = 1 and memory-constrained deployment, enabling what I call <strong>deep edge intelligence</strong>
+                    through localized, adaptive inference.
+                </p>
+
+                <p>
+                    I am actively exploring transformers and post-transformer architectures, particularly <strong>state-space hybrids like the
+                    Mamba series</strong>, which offer linear-time inference with transformer-level accuracy. I am driven by recent results
+                    demonstrating the tangible potential of this paradigm for modalities like voice, where linear complexity scaling becomes critical.
+                </p>
+
+                <p>
+                    Building on this, my work involves <strong>Neural Architecture Search (NAS)</strong> and multi-dimensional model reduction through
+                    quantization, pruning, and sparsity to design architectures tailored for edge-level latency and power constraints.
+                    The guiding lens for this exploration is the <strong>Roofline model</strong>, which highlights how edge systems are predominantly
+                    memory-bound rather than compute-bound.
+                </p>
+
+                <p>
+                    Instead of maximizing arithmetic throughput, my research targets memory access efficiency and digital <strong>in-memory computing
+                    paradigms</strong> that retain data locality while sustaining performance. Ultimately, I envision a multi-context edge AI framework,
+                    where compression-aware models power emerging applications in physical AI, robotics, and humanoid intelligence.
+                </p>
+
+                <p>
+                    I see agentic AI frameworks as the enabler of this shift, where generative systems guide architectural exploration dynamically rather
+                    than through traditional static optimization. At its core, my research strives for sustainability through efficiency, aligning
+                    closely with the vision of energy-conscious computation.
+                </p>
             </div>
-
-            <div class="nav-links">
-                <a href="mailto:lahari1803ks@gmail.com" class="nav-link">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                        <path d="m2 7 10 7 10-7"></path>
-                    </svg>
-                    <span>Email</span>
-                </a>
-                <a href="#projects" class="nav-link">
-                    <!-- Simple folder/code icon SVG -->
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"></path>
-                    </svg>
-                    <span>Projects</span>
-                </a>
-                <a href="blog.html" class="nav-link">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
-                        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                    </svg>
-                    <span>Blog</span>
-                </a>
-                <a href="https://github.com/LAHARI2003" class="nav-link" target="_blank">
-                    <svg class="nav-icon" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/>
-                    </svg>
-                    <span>GitHub</span>
-                </a>
-                <a href="Research_Statement (1).pdf" class="nav-link" title="Download CV" target="_blank">
-                   <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-                        <polyline points="7 10 12 15 17 10"></polyline>
-                        <line x1="12" y1="15" x2="12" y2="3"></line>
-                    </svg>
-                    <span>CV</span>
-                </a>
-            </div>
-        </header>
-
-        <section class="about-section">
-            <h2>About Me</h2>
-            <p>I’m <strong>Kommalapati Lahari</strong>, an IIT Patna Computer Science graduate.</p> 
-            
-            <p>
-                My research focuses on developing efficient and sustainable AI accelerators by jointly optimizing algorithms
-                and architectures. I see a paradigm shift from large-scale LLMs toward <strong>Edge Language Models (ELMs)</strong>
-                optimized for batch size = 1 and memory-constrained deployment, enabling what I call <strong>deep edge intelligence</strong>
-                through localized, adaptive inference.
-            </p>
-
-            <p>
-                I am actively exploring transformers and post-transformer architectures, particularly <strong>state-space hybrids like the
-                Mamba series</strong>, which offer linear-time inference with transformer-level accuracy. I am driven by recent results 
-                demonstrating the tangible potential of this paradigm for modalities like voice, where linear complexity scaling becomes critical.
-            </p>
-
-            <p>
-                Building on this, my work involves <strong>Neural Architecture Search (NAS)</strong> and multi-dimensional model reduction through
-                quantization, pruning, and sparsity to design architectures tailored for edge-level latency and power constraints.
-                The guiding lens for this exploration is the <strong>Roofline model</strong>, which highlights how edge systems are predominantly
-                memory-bound rather than compute-bound.
-            </p>
-            
-            <p>
-                Instead of maximizing arithmetic throughput, my research targets memory access efficiency and digital <strong>in-memory computing
-                paradigms</strong> that retain data locality while sustaining performance. Ultimately, I envision a multi-context edge AI framework, 
-                where compression-aware models power emerging applications in physical AI, robotics, and humanoid intelligence.
-            </p>
-
-            <p>
-                I see agentic AI frameworks as the enabler of this shift, where generative systems guide architectural exploration dynamically rather 
-                than through traditional static optimization. At its core, my research strives for sustainability through efficiency, aligning
-                closely with the vision of energy-conscious computation.
-            </p>
         </section>
 
-        <section id="projects" class="pubs-section" style="margin-top: 40px;">
-            <h2>Research Implementations</h2>
-            <p style="margin-bottom: 24px; color: #555;">
-                Core research projects and experimental frameworks driving my exploration of efficient edge intelligence.
-            </p>
-            <div class="pub-item">
-                <div class="pub-title">Generative AI for HLS Optimization & Verification</div>
-                <div class="pub-venue">STMicroelectronics (Internship)</div>
-                <p style="font-size: 0.95rem; margin-bottom: 10px;">
-                    Built an end-to-end pipeline for Design Space Optimization (DSO) using generative AI. 
-                    Optimized accelerator-level C++ code for synthesis to improve PPA metrics and automated 
-                    UVM testbench generation for verification coverage closure.
-                </p>
-                <div class="pub-links">
-                    <span style="font-size: 0.85rem; color: #666;">Technologies: HLS, C++, UVM, Generative AI</span>
-                </div>
-            </div>
+        <section class="section" id="projects">
+            <div class="section-label">Research</div>
+            <div class="item-list">
 
-            
-            <div class="pub-grid">
-                <div class="pub-item">
-                    <div class="pub-title">InvGuard: Agentic AI for Smart Contract Security</div>
-                    <div class="pub-venue">Independent Research</div>
-                    <p style="font-size: 0.95rem; margin-bottom: 10px;">
-                        Designed a multi-agent AI system for autonomous vulnerability detection & repair in smart contracts. 
-                        Developed modules for end-to-end invariant synthesis & patching, achieving <strong>96.2% invariant precision</strong> 
+                <div class="flat-item">
+                    <div class="flat-item-title">Generative AI for HLS Optimization &amp; Verification</div>
+                    <div class="flat-item-venue">STMicroelectronics — Internship</div>
+                    <p class="flat-item-desc">
+                        Built an end-to-end pipeline for Design Space Optimization (DSO) using generative AI.
+                        Optimized accelerator-level C++ code for synthesis to improve PPA metrics and automated
+                        UVM testbench generation for verification coverage closure.
+                    </p>
+                    <div class="flat-item-tags">HLS · C++ · UVM · Generative AI</div>
+                </div>
+
+                <div class="flat-item">
+                    <div class="flat-item-title">InvGuard: Agentic AI for Smart Contract Security</div>
+                    <div class="flat-item-venue">Independent Research</div>
+                    <p class="flat-item-desc">
+                        Designed a multi-agent AI system for autonomous vulnerability detection &amp; repair in smart contracts.
+                        Developed modules for end-to-end invariant synthesis &amp; patching, achieving <strong>96.2% invariant precision</strong>
                         and mitigating 74/91 real-world exploits.
                     </p>
-                    <div class="pub-links">
-                        <span style="font-size: 0.85rem; color: #666;">Technologies: Multi-Agent Systems, LLMs, Security Auditing</span>
-                    </div>
+                    <div class="flat-item-tags">Multi-Agent Systems · LLMs · Security Auditing</div>
                 </div>
 
-                
-                <div class="pub-item">
-                    <div class="pub-title">Real-time Driver Behavior Analysis</div>
-                    <div class="pub-venue">IIT Hyderabad (Research Internship)</div>
-                    <p style="font-size: 0.95rem; margin-bottom: 10px;">
-                        Developed a behavior analysis pipeline using PCA (82% variance) and K-Means clustering. 
-                        Proposed a novel "Lateral Shift Ratio" metric for lane-keeping stability and classified driving events 
+                <div class="flat-item">
+                    <div class="flat-item-title">Real-time Driver Behavior Analysis</div>
+                    <div class="flat-item-venue">IIT Hyderabad — Research Internship</div>
+                    <p class="flat-item-desc">
+                        Developed a behavior analysis pipeline using PCA (82% variance) and K-Means clustering.
+                        Proposed a novel "Lateral Shift Ratio" metric for lane-keeping stability and classified driving events
                         into behavioral clusters with ANOVA-based validation.
                     </p>
-                    <div class="pub-links">
-                        <span style="font-size: 0.85rem; color: #666;">Technologies: PCA, K-Means, Statistical Analysis</span>
-                    </div>
+                    <div class="flat-item-tags">PCA · K-Means · Statistical Analysis</div>
                 </div>
+
             </div>
         </section>
 
-        <section class="pubs-section">
-            <h2>Research Publications</h2>
-            <div class="pub-grid">
-                <div class="pub-item">
-                    <div class="pub-title">Classification of Driving Styles based on Longitudinal and Lateral Behavior at Exit Ramp Terminals</div>
-                    <div class="pub-venue">Transportation Research Board (TRB) Annual Meeting 2025</div>
-                    <div class="pub-links">Documentation: <a href="https://drive.google.com/file/d/19-ysAjo7rzFCUO0e0yvFXroGFh5o_q-T/view?usp=sharing" target="_blank" rel="noopener noreferrer">Acceptance Letter</a> | <a href="https://drive.google.com/file/d/1s2zLfvCQIBFVV5fxgzjLjgXjGnv6RdUv/view?usp=sharing" target="_blank" rel="noopener noreferrer">Full Paper</a></div>
+        <section class="section">
+            <div class="section-label">Publications</div>
+            <div class="item-list">
+
+                <div class="flat-item">
+                    <div class="flat-item-title">Classification of Driving Styles based on Longitudinal and Lateral Behavior at Exit Ramp Terminals</div>
+                    <div class="flat-item-venue">Transportation Research Board (TRB) Annual Meeting 2025</div>
+                    <div class="flat-item-links">
+                        <a href="https://drive.google.com/file/d/19-ysAjo7rzFCUO0e0yvFXroGFh5o_q-T/view?usp=sharing" target="_blank" rel="noopener noreferrer">Acceptance Letter</a>
+                        <span class="link-sep">·</span>
+                        <a href="https://drive.google.com/file/d/1s2zLfvCQIBFVV5fxgzjLjgXjGnv6RdUv/view?usp=sharing" target="_blank" rel="noopener noreferrer">Full Paper</a>
+                    </div>
                 </div>
-                <div class="pub-item">
-                    <div class="pub-title">Autonomous Smart Contract Hardening: The Fusion of LLMs and Invariant-Guided Security Repair</div>
-                    <div class="pub-venue">Foundations of Software Engineering (FSE) Conference 2026 (Under Review)</div>
-                    <div class="pub-links">Documentation: <a href="https://drive.google.com/file/d/1WHfOLI-5aTAJM-4YtiNmkjzrcO96xL_8/view?usp=sharing" target="_blank" rel="noopener noreferrer">Paper Draft</a></div>
+
+                <div class="flat-item">
+                    <div class="flat-item-title">Autonomous Smart Contract Hardening: The Fusion of LLMs and Invariant-Guided Security Repair</div>
+                    <div class="flat-item-venue">Foundations of Software Engineering (FSE) 2026 — Under Review</div>
+                    <div class="flat-item-links">
+                        <a href="https://drive.google.com/file/d/1WHfOLI-5aTAJM-4YtiNmkjzrcO96xL_8/view?usp=sharing" target="_blank" rel="noopener noreferrer">Paper Draft</a>
+                    </div>
                 </div>
+
             </div>
         </section>
-    </div>
+
+    </main>
+
+</div>
 </body>
 </html>
