@@ -60,38 +60,34 @@
         <section class="section">
             <div class="section-label">About</div>
             <div class="about-content">
-                <p>I'm <strong>Kommalapati Lahari</strong>, an IIT Patna Computer Science graduate.</p>
+                <p>I'm <strong>Kommalapati Lahari</strong>, a Computer Science graduate from IIT Patna.</p>
 
                 <p>
-                    My research focuses on developing efficient and sustainable AI accelerators by jointly optimizing algorithms
-                    and architectures. I see a paradigm shift from large-scale LLMs toward <strong>Edge Language Models (ELMs)</strong>
-                    optimized for batch size = 1 and memory-constrained deployment, enabling what I call <strong>deep edge intelligence</strong>
-                    through localized, adaptive inference.
+                    Right now, the most capable AI runs in data centres and behind subscriptions, so access depends on what you can pay for.
+                    I want to help change that. Running a largely capable, general-purpose model on a memory-constrained device is a long shot
+                    today: a single inference demands more memory bandwidth than such devices can offer. So the practical starting point is
+                    narrower: task-specific models that fit real memory budgets, made viable by designing the model and the hardware together.
+                    Small language models and state-space models are a good fit here, and in domains like voice, where inputs arrive as a
+                    continuous stream and the work is steady rather than bursty, this approach already shows real gains. Pairing these models
+                    with <strong>in-memory computing</strong>, which keeps data where it is processed, gives a foundation to build on.
                 </p>
 
                 <p>
-                    I am actively exploring transformers and post-transformer architectures, particularly <strong>state-space hybrids like the
-                    Mamba series</strong>, which offer linear-time inference with transformer-level accuracy. I am driven by recent results
-                    demonstrating the tangible potential of this paradigm for modalities like voice, where linear complexity scaling becomes critical.
+                    I've been working at <strong>STMicroelectronics</strong>, and that work is what shaped this view. On high-level synthesis,
+                    I built a system that uses generative models to select the pragmas that meet a design's requirements, in place of a
+                    designer's manual and often-biased search. Separately, I worked on automating the functional verification of
+                    dataflow-heavy algorithmic IP, slow work on two fronts: writing a sound verification plan, and then the boilerplate UVM
+                    code each item in that plan needs. We scoped this to data-heavy algorithmic blocks, since for control-heavy blocks the
+                    equivalence between an untimed reference and timed RTL becomes intractable. Together they raised how I look at problems
+                    and made clear where the leverage is: efficiency has to be built in from both the algorithm and hardware sides, not added
+                    at the end.
                 </p>
 
                 <p>
-                    Building on this, my work involves <strong>Neural Architecture Search (NAS)</strong> and multi-dimensional model reduction through
-                    quantization, pruning, and sparsity to design architectures tailored for edge-level latency and power constraints.
-                    The guiding lens for this exploration is the <strong>Roofline model</strong>, which highlights how edge systems are predominantly
-                    memory-bound rather than compute-bound.
-                </p>
-
-                <p>
-                    Instead of maximizing arithmetic throughput, my research targets memory access efficiency and digital <strong>in-memory computing
-                    paradigms</strong> that retain data locality while sustaining performance. Ultimately, I envision a multi-context edge AI framework,
-                    where compression-aware models power emerging applications in physical AI, robotics, and humanoid intelligence.
-                </p>
-
-                <p>
-                    I see agentic AI frameworks as the enabler of this shift, where generative systems guide architectural exploration dynamically rather
-                    than through traditional static optimization. At its core, my research strives for sustainability through efficiency, aligning
-                    closely with the vision of energy-conscious computation.
+                    Both point to the same thing: sustainability and accessibility are the same problem. A model that is too expensive to run
+                    is one most people never get to use. And even for those who can, the cost does not go away: inference economics is
+                    becoming one of the harder problems in the field, where the price of running a model at scale shapes what is actually
+                    viable to build. Designing for efficiency from the start is how that cost stays in reach.
                 </p>
             </div>
         </section>
