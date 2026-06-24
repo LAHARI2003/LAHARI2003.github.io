@@ -56,7 +56,6 @@ a {
 /* Header / Profile Section */
 header {
     margin-bottom: 60px;
-    animation: fadeInDown 0.8s ease-out;
 }
 
 /* Photo + Name side by side */
@@ -152,7 +151,6 @@ header {
     box-shadow: var(--shadow-sm);
     margin-bottom: 40px;
     border: 1px solid rgba(0,0,0,0.03);
-    animation: fadeInUp 0.8s ease-out 0.2s backwards;
 }
 
 .about-section h2 {
@@ -177,7 +175,6 @@ header {
 /* Publications */
 .pubs-section {
     margin-top: 60px;
-    animation: fadeInUp 0.8s ease-out 0.4s backwards;
 }
 
 .pubs-section h2 {
@@ -865,6 +862,29 @@ pre {
 .blog-post-meta {
     font-size: 0.78rem;
     color: #bbb;
+}
+
+/* Back button on post pages */
+.post-back {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: #aaa;
+    font-weight: 500;
+    text-decoration: none;
+    margin-bottom: 28px;
+    transition: color 0.18s;
+    letter-spacing: 0.02em;
+}
+
+.post-back:hover {
+    color: #006d77;
+}
+
+/* Post title sizing inside sidebar layout */
+.main-content .page-title {
+    font-size: 1.9rem;
+    margin-bottom: 12px;
+    letter-spacing: 0;
 }
 
 .blog-coming-soon {
