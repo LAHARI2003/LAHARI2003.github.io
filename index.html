@@ -65,31 +65,21 @@
                 <p>I'm <strong>Kommalapati Lahari</strong>, a Computer Science graduate from IIT Patna.</p>
 
                 <p>
-                    Right now, the most capable AI runs in data centres and behind subscriptions, so access depends on what you can pay for.
-                    I want to help change that. Running a largely capable, general-purpose model on a memory-constrained device is a long shot
-                    today: a single inference demands more memory bandwidth than such devices can offer. So the practical starting point is
-                    narrower: task-specific models that fit real memory budgets, made viable by designing the model and the hardware together.
-                    Small language models and state-space models are a good fit here, and in domains like voice, where inputs arrive as a
-                    continuous stream and the work is steady rather than bursty, this approach already shows real gains. Pairing these models
-                    with <strong>in-memory computing</strong>, which keeps data where it is processed, gives a foundation to build on.
+                    Today's most capable AI runs behind subscriptions and inside data centers — access depends on what you can pay for.
+                    I want to change that by making models efficient enough to run on memory-constrained edge devices, starting with
+                    task-specific small language and state-space models paired with <strong>in-memory computing</strong>, in workloads
+                    that stream steadily rather than burst — voice is a good example. My time at <strong>STMicroelectronics</strong>
+                    shaped this view, working the efficiency problem from both the algorithm and hardware sides:
                 </p>
 
-                <p>
-                    I've been working at <strong>STMicroelectronics</strong>, and that work is what shaped this view. On high-level synthesis,
-                    I built a system that uses generative models to select the pragmas that meet a design's requirements, in place of a
-                    designer's manual and often-biased search. Separately, I worked on automating the functional verification of
-                    dataflow-heavy algorithmic IP, slow work on two fronts: writing a sound verification plan, and then the boilerplate UVM
-                    code each item in that plan needs. We scoped this to data-heavy algorithmic blocks, since for control-heavy blocks the
-                    equivalence between an untimed reference and timed RTL becomes intractable. Together they raised how I look at problems
-                    and made clear where the leverage is: efficiency has to be built in from both the algorithm and hardware sides, not added
-                    at the end.
-                </p>
+                <ul class="about-highlights">
+                    <li><strong>HLS Optimization</strong> — Built a generative-AI pipeline to select pragmas that meet a design's requirements, replacing a designer's manual, often-biased search.</li>
+                    <li><strong>Verification Automation</strong> — Automated functional verification for dataflow-heavy algorithmic IP, scoped to data-heavy blocks, since control-heavy blocks make untimed-to-timed RTL equivalence intractable.</li>
+                </ul>
 
                 <p>
-                    Both point to the same thing: sustainability and accessibility are the same problem. A model that is too expensive to run
-                    is one most people never get to use. And even for those who can, the cost does not go away: inference economics is
-                    becoming one of the harder problems in the field, where the price of running a model at scale shapes what is actually
-                    viable to build. Designing for efficiency from the start is how that cost stays in reach.
+                    Sustainability and accessibility are the same problem: a model too expensive to run is one most people never use.
+                    Designing for efficiency from the start is how it stays affordable at scale.
                 </p>
             </div>
         </section>
